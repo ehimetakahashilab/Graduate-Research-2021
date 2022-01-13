@@ -1,0 +1,110 @@
+%卒業論文用テンプレート
+\documentstyle[graphicx]{jronbun}
+
+
+%諸定義
+\newenvironment{indention}[1]{\par
+\addtolength{\leftskip}{#1}
+\begingroup}{\endgroup\par}
+
+%論文名
+\title{3密回避のための室内環境情報の能動的提供機能の開発}
+%教官名
+\kyoukan{高橋寛教授}
+\second{王森レイ講師}
+%名前
+\author{小田 恵吏奈}
+%提出日
+\date{令和3年2月17日提出}
+%講座名
+\kouza{\gt 愛媛大学工学部情報工学科情報システム工学講座}
+
+\begin{document}
+	%タイトル生成
+	\maketitle
+	%目次生成
+	\pagenumbering{roman}
+	\tableofcontents
+	\cleardoublepage
+	\pagenumbering{arabic}
+	
+	%--ここから本文--
+	%第1章　まえがき
+	\chapter{まえがき}
+	\input{1}
+	
+	%第2章　準備
+	\chapter{準備}
+	\input{2}
+	
+	%第3章　
+	\chapter{感染症予防サポートシステムの設計}
+	\input{3}
+	\input{3-1}
+	\input{3-2}
+	\input{3-3}
+	\input{3-4}
+	\input{3-5}
+	
+	%第4章
+	\chapter{実装・検証}
+	\input{4}
+	\input{4-1}
+	\input{4-2}
+	
+	%第5章
+	\chapter{評価・考察}
+	\input{5}
+	\input{5-1}
+	\input{5-2}
+	
+	%第6章
+	\chapter{あとがき}
+	\input{6}
+	%--ここまで本文--
+	
+	
+	%謝辞
+	\newpage
+	\addcontentsline{toc}{chapter}{\protect\numberline{謝辞}{}}
+	\chapter*{謝辞}
+	%--ここから謝辞--
+	本研究を進めるにあたり,懇篤な御指導,御鞭撻を賜わりました本学高橋寛教授に深く御礼申し上げます.
+	
+	本論文の作成に関し,詳細なるご検討,貴重な御教示を頂きました本学甲斐博准教授ならびに王森レイ講師に深く御礼申し上げます.
+	
+	本研究に際しご審査いただきました稲元　勉講師，井門　俊講師に深く御礼申し上げます．
+	
+	最後に,多大な御協力と貴重な御助言を頂いた本学工学部情報工学科情報システム工学講座高橋研究室の諸氏に厚く御礼申し上げます.
+	
+	%--ここまで謝辞--
+	
+	%参考文献
+	\begin{thebibliography}{99}
+		%ここから参考文献
+		
+		\bibitem{qa}
+		厚生労働省,新型コロナウィルスに関するQ\&A（一般の方向け）$|$厚生労働省,
+		https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou\_iryou/\\dengue\_fever\_qa\_00001.html，2021-1-4
+		
+		\bibitem{kanki}
+		厚生労働省,「換気の悪い密閉空間」を改善するための換気の方法,
+		https://www.mhlw.go.jp/content/10900000/000618969.pdf，2020-4-3
+		
+		\bibitem{isence}
+		中畑和之，森伸一郎，板垣吉晃，河合慶有, "コロナウイルス対策のための教室換気実験とアラートシステムの構築," 愛媛大学工学部社会基盤iセンシングセンター報告資料,  2020年11月.
+		
+		\bibitem{vji}
+		V字モデル（V-model）とは -IT用語辞典 e-Words,
+		https://e-words.jp/w/V%E5%AD%97%E3%83%A2%E3%83%87%E3%83%AB.html
+		
+		\bibitem{uml}
+		株式会社 オージス総研, かんたんUML[増補改訂版], 翔泳社, 2003
+		
+		\bibitem{twelite}
+		モノをつなぐ無線マイコンモジュール TWELITE-トワイライト - MONO-WIRELESS.COM,
+		https://mono-wireless.com/jp/products/TWE-LITE/index.html
+		%ここまで参考文献
+		
+	\end{thebibliography}
+\end{document}

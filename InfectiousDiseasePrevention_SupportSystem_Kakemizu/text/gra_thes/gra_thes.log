@@ -1,0 +1,357 @@
+This is e-pTeX, Version 3.14159265-p3.8.3-191112-2.6 (utf8.sjis) (TeX Live 2020/W32TeX) (preloaded format=platex 2021.1.14)  14 FEB 2021 14:29
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**gra_thes.tex
+(./gra_thes.tex
+pLaTeX2e <2020-10-01>+1 (based on LaTeX2e <2020-10-01> patch level 4)
+L3 programming layer <2021-01-09> xparse <2020-03-03>
+(c:/texlive/2020/texmf-dist/tex/platex/base/pl209.def
+Entering pLaTeX 2.09 compatibility mode.
+(c:/texlive/2020/texmf-dist/tex/latex/base/latex209.def
+File: latex209.def 2020/08/21 v0.55 Standard LaTeX file
+
+
+          Entering LaTeX 2.09 COMPATIBILITY MODE
+ *************************************************************
+    !!WARNING!!    !!WARNING!!    !!WARNING!!    !!WARNING!!   
+ 
+ This mode attempts to provide an emulation of the LaTeX 2.09
+ author environment so that OLD documents can be successfully
+ processed. It should NOT be used for NEW documents!
+ 
+ New documents should use Standard LaTeX conventions and start
+ with the \documentclass command.
+ 
+ Compatibility mode is UNLIKELY TO WORK with LaTeX 2.09 style
+ files that change any internal macros, especially not with
+ those that change the FONT SELECTION or OUTPUT ROUTINES.
+ 
+ Therefore such style files MUST BE UPDATED to use
+          Current Standard LaTeX: LaTeX2e.
+ If you suspect that you may be using such a style file, which
+ is probably very, very old by now, then you should attempt to
+ get it updated by sending a copy of this error message to the
+ author of that file.
+ *************************************************************
+
+\footheight=\dimen154
+\@maxsep=\dimen155
+\@dblmaxsep=\dimen156
+\@cla=\count176
+\@clb=\count177
+\mscount=\count178
+(c:/texlive/2020/texmf-dist/tex/latex/base/tracefnt.sty
+Package: tracefnt 2019/10/11 v3.0l Standard LaTeX package (font tracing)
+\tracingfonts=\count179
+LaTeX Info: Redefining \selectfont on input line 106.
+)
+\symbold=\mathgroup4
+\symsans=\mathgroup5
+\symtypewriter=\mathgroup6
+\symitalic=\mathgroup7
+\symsmallcaps=\mathgroup8
+\symslanted=\mathgroup9
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 275.
+LaTeX Font Info:    Redeclaring math alphabet \mathsf on input line 276.
+LaTeX Font Info:    Redeclaring math alphabet \mathtt on input line 277.
+LaTeX Font Info:    Redeclaring math alphabet \mathit on input line 283.
+LaTeX Info: Redefining \em on input line 293.
+
+(c:/texlive/2020/texmf-dist/tex/latex/base/latexsym.sty
+Package: latexsym 1998/08/17 v2.2e Standard LaTeX package (lasy symbols)
+\symlasy=\mathgroup10
+LaTeX Font Info:    Overwriting symbol font `lasy' in version `bold'
+(Font)                  U/lasy/m/n --> U/lasy/b/n on input line 52.
+)
+LaTeX Font Info:    Redeclaring math delimiter \lgroup on input line 339.
+LaTeX Font Info:    Redeclaring math delimiter \rgroup on input line 341.
+LaTeX Font Info:    Redeclaring math delimiter \bracevert on input line 343.
+)
+(c:/texlive/2020/texmf-dist/tex/platex/base/ptrace.sty
+Package: ptrace 2020/03/26 v1.7e Standard pLaTeX package (font tracing)
+Applying: [2020/04/12] Check \KanjiEncodingPair  on input line 21.
+LaTeX Info: Redefining \selectfont on input line 22.
+Already applied: [0000/00/00] ASCII Corporation original on input line 81.
+Applying: [2017/04/08] Construct \ystrutbox  on input line 139.
+Already applied: [0000/00/00] ASCII Corporation original on input line 174.
+Applying: [2019/10/01] Make robust on input line 209.
+LaTeX Info: Redefining \adjustbaseline on input line 210.
+Already applied: [2017/07/29] Change zenkaku reference on input line 233.
+Already applied: [0000/00/00] ASCII Corporation original on input line 258.
+)
+\symmincho=\mathgroup11
+\symgothic=\mathgroup12
+LaTeX Font Info:    Overwriting symbol font `mincho' in version `bold'
+(Font)                  JY1/mc/m/n --> JY1/gt/m/n on input line 35.
+LaTeX Info: Redefining \bf on input line 49.
+LaTeX Info: Redefining \rm on input line 56.
+LaTeX Info: Redefining \sf on input line 57.
+LaTeX Info: Redefining \sl on input line 58.
+LaTeX Info: Redefining \sc on input line 59.
+LaTeX Info: Redefining \it on input line 60.
+LaTeX Info: Redefining \tt on input line 61.
+LaTeX Info: Redefining \em on input line 62.
+) (./jronbun.cls
+Document Style ``修士or卒業論文(日本語用)''. <19 Feb 94>
+\descriptionmargin=\dimen157
+\c@part=\count180
+\c@chapter=\count181
+\c@section=\count182
+\c@subsection=\count183
+\c@subsubsection=\count184
+\c@paragraph=\count185
+\c@subparagraph=\count186
+\c@figure=\count187
+\c@table=\count188
+\leftheadmargin=\dimen158
+\rightheadmargin=\dimen159
+\rightheadoutmargin=\dimen160
+) (c:/texlive/2020/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2020/09/09 v1.2b Enhanced LaTeX Graphics (DPC,SPQR)
+
+(c:/texlive/2020/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks16
+)
+(c:/texlive/2020/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2020/08/30 v1.4c Standard LaTeX Graphics (DPC,SPQR)
+
+(c:/texlive/2020/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+(c:/texlive/2020/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: dvips.def on input line 105.
+
+(c:/texlive/2020/texmf-dist/tex/latex/graphics-def/dvips.def
+File: dvips.def 2017/06/20 v3.1d Graphics/color driver for dvips
+))
+\Gin@req@height=\dimen161
+\Gin@req@width=\dimen162
+)
+(c:/texlive/2020/texmf-dist/tex/latex/here/here.sty)
+(c:/texlive/2020/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count189
+\float@exts=\toks17
+\float@box=\box64
+\@float@everytoks=\toks18
+\@floatcapt=\box65
+)
+(c:/texlive/2020/texmf-dist/tex/latex/tools/longtable.sty
+Package: longtable 2020/01/07 v4.13 Multi-page Table package (DPC)
+\LTleft=\skip47
+\LTright=\skip48
+\LTpre=\skip49
+\LTpost=\skip50
+\LTchunksize=\count190
+\LTcapwidth=\dimen163
+\LT@head=\box66
+\LT@firsthead=\box67
+\LT@foot=\box68
+\LT@lastfoot=\box69
+\LT@cols=\count191
+\LT@rows=\count192
+\c@LT@tables=\count193
+\c@LT@chunks=\count194
+\LT@p@ftn=\toks19
+)
+(c:/texlive/2020/texmf-dist/tex/latex/l3backend/l3backend-dvips.def
+File: l3backend-dvips.def 2021-01-09 L3 backend support: dvips
+\l__pdf_internal_box=\box70
+\g__pdf_backend_object_int=\count195
+\l__pdf_backend_content_box=\box71
+\l__pdf_backend_model_box=\box72
+\g__pdf_backend_annotation_int=\count196
+\g__pdf_backend_link_int=\count197
+\g__pdf_backend_link_sf_int=\count198
+)
+(./gra_thes.aux
+
+LaTeX Warning: Label `testdata' multiply defined.
+
+)
+\openout1 = `gra_thes.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for JY1/mc/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for JT1/mc/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <14.4> on input line 25.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 25.
+LaTeX Font Info:    Trying to load font information for U+lasy on input line 25
+.
+ (c:/texlive/2020/texmf-dist/tex/latex/base/ulasy.fd
+File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
+) [0
+
+
+]
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <24.88> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 28.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <24.88> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 28.
+ (./gra_thes.toc
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <12> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 1.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <12> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 1.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 4.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 4.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 4.
+)
+\tf@toc=\write3
+\openout3 = `gra_thes.toc'.
+
+
+[1
+
+]
+第 1 章
+(./1.tex [1
+
+
+] [2]) [3]
+第 2 章
+(./2.tex
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <14.4> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 4.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <14.4> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 4.
+File: buiji.eps Graphic file (type eps)
+ <buiji.eps> [4
+
+] [5]) [6]
+第 3 章
+(./3.tex) (./3-1.tex
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <17.28> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 2.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <17.28> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 2.
+ [7
+
+] [8] [9] [10]
+File: systemflow.eps Graphic file (type eps)
+ <systemflow.eps> [11]
+File: systemconst.eps Graphic file (type eps)
+ <systemconst.eps>)
+(./3-2.tex
+File: usecase.eps Graphic file (type eps)
+ <usecase.eps> [12] [13] [14] [15]
+File: analysisimage.eps Graphic file (type eps)
+ <analysisimage.eps> [16] [17]
+File: usecasekijutu.eps Graphic file (type eps)
+
+<usecasekijutu.eps> [18]
+File: sougoutest_koumoku.eps Graphic file (type eps)
+ <sougoutest_koumoku.eps>) (./3-3.tex
+File: a_kansi.eps Graphic file (type eps)
+ <a_kansi.eps>
+[19]
+Overfull \vbox (6.19206pt too high) has occurred while \output is active []
+
+
+[20]
+File: a_kanki.eps Graphic file (type eps)
+ <a_kanki.eps>
+Overfull \vbox (16.82477pt too high) has occurred while \output is active []
+
+
+[21]
+File: a_nyuusitu.eps Graphic file (type eps)
+ <a_nyuusitu.eps>
+File: a_situnaikankyou.eps Graphic file (type eps)
+ <a_situnaikankyou.eps> [22] [23] [24]
+File: class.eps Graphic file (type eps)
+ <class.eps>
+File: ketugoutest_koumoku.eps Graphic file (type eps)
+
+<ketugoutest_koumoku.eps> [25]) (./3-4.tex
+File: s_kansi.eps Graphic file (type eps)
+ <s_kansi.eps>
+File: s_kanki.eps Graphic file (type eps)
+ <s_kanki.eps> [26]
+File: s_nyuusitu.eps Graphic file (type eps)
+
+<s_nyuusitu.eps> [27]
+File: s_situnaikankyou.eps Graphic file (type eps)
+ <s_situnaikankyou.eps> [28] [29] [30]
+File: jtantaitest_koumoku.eps Graphic file (type eps)
+
+<jtantaitest_koumoku.eps> [31]
+File: dtantaitest_koumoku.eps Graphic file (type eps)
+ <dtantaitest_koumoku.eps>) [32] [33]
+第 4 章
+(./4.tex) (./4-1.tex [34
+
+] [35]) (./4-2.tex [36]
+File: jtantaitest.eps Graphic file (type eps)
+ <jtantaitest.eps> [37]
+File: dtantaitest.eps Graphic file (type eps)
+
+<dtantaitest.eps>
+File: ketugoutest.eps Graphic file (type eps)
+ <ketugoutest.eps> [38]
+File: sougoutest.eps Graphic file (type eps)
+ <sougoutest.eps> [39]
+Underfull \vbox (badness 10000) detected at line 85
+ []
+
+[40] [41]
+Underfull \vbox (badness 10000) detected at line 135
+ []
+
+[42]) [43]
+第 5 章
+(./5.tex [44
+
+]) [45] [46]
+第 6 章
+(./6.tex) [47
+
+] [48
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 88--89
+[]\JY1/mc/m/n/12 厚生労働省\OT1/cmr/m/n/12 ,2020-2,"\JY1/mc/m/n/12 新型コロナウ
+イルス感染症対策の基本方
+ []
+
+[49
+
+] (./gra_thes.aux)
+
+LaTeX Warning: There were multiply-defined labels.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 1381 strings out of 481257
+ 20233 string characters out of 5916642
+ 317060 words of memory out of 5000000
+ 18588 multiletter control sequences out of 15000+600000
+ 428126 words of font info for 121 fonts, out of 8000000 for 9000
+ 14 hyphenation exceptions out of 8191
+ 70i,14n,74p,1210b,397s stack positions out of 5000i,500n,10000p,200000b,80000s
+
+Output written on gra_thes.dvi (51 pages, 118252 bytes).

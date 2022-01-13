@@ -1,0 +1,19 @@
+#!/bin/sh
+
+TEST_VEC=30
+
+for f in s1488
+#for f in s27 s208 s344 s349 s382 s386 s400 s420 s444 s510 s526 s526n s641 s713 s820 s832 s838 s953 s1196 s1238 s1423 s1488 s1494 s5378 s9234 s13207 s15850 s35932 s38417 s38584 
+
+do
+
+    CIRCUIT=../circuit/$f
+
+    echo === Making $TEST_VEC Test Vectors for $f ===
+    ./lfsr $CIRCUIT $TEST_VEC
+
+    echo 
+
+    mv tmp.test "$f".test
+
+done

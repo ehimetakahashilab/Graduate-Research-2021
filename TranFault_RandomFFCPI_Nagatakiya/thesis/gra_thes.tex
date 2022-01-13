@@ -1,0 +1,117 @@
+%卒業論文用テンプレート
+\documentstyle[graphicx]{jronbun}
+
+
+%諸定義
+\newenvironment{indention}[1]{\par
+\addtolength{\leftskip}{#1}
+\begingroup}{\endgroup\par}
+
+%論文名
+\title{マルチサイクルテストにおける遅延故障の検出強化技術}
+%教官名
+\kyoukan{高橋寛教授}
+\second{王森レイ講師}
+%名前
+\author{長滝谷剣}
+%提出日
+\date{令和3年2月15日提出}
+%講座名
+\kouza{\gt 愛媛大学工学部情報工学科情報システム工学講座}
+
+\begin{document}
+%タイトル生成
+\maketitle
+%目次生成
+\pagenumbering{roman}
+\tableofcontents
+\cleardoublepage
+\pagenumbering{arabic}
+
+%--ここから本文-----------------------------------
+%第1章　まえがき
+\chapter{まえがき}
+\input{preface.tex}
+
+%第2章　定義
+\chapter{定義}
+\input{definition.tex}
+
+%第3章　
+\chapter{マルチサイクルテスト}
+\input{multicycle.tex}
+
+%第4章
+\chapter{FF制御点挿入技術(FF-CPI)}
+\input{FFCPI.tex}
+
+%第5章
+\chapter{実験}
+\input{exp.tex}
+
+%第6章
+\chapter{考察}
+\input{consider.tex}
+
+%第7章
+\chapter{まとめ}
+\input{summary.tex}
+%--ここまで本文-----------------------------------
+
+
+%謝辞
+\newpage
+\addcontentsline{toc}{chapter}{\protect\numberline{謝辞}{}}
+\chapter*{謝辞}
+%--ここから謝辞--
+本研究を進めるにあたり，
+懇篤な御指導，御鞭撻を賜わりました本学高橋寛教授に深く御礼申し上げます．
+
+本論文の作成に関し，
+詳細なるご検討，貴重な御教示を頂きました本学王森レイ講師ならびに甲斐博准教授に深く御礼申し上げます．
+
+また，本研究に際しご審査いただきました本学井門　俊講師に深く御礼申し上げます．
+
+最後に,多大な御協力と貴重な御助言を頂いた
+本学工学部情報工学科情報システム工学講座高橋研究室の諸氏に厚く御礼申し上げます.
+
+%--ここまで謝辞--
+
+%参考文献
+\begin{thebibliography}{99}
+%ここから参考文献
+
+%--例--
+%\bibitem{Interconnect}
+%Bram Kruseman , Ananta K. Majihi , Wilmar Heuvalman , Jennifer Dworak“NIM-X : A Noise Index Model-Based X-Filling technique to Overcome the Power Supply Switching Noise Effects on Path Delay Test" IEEE Trans. on VLSI Test Symp. ,pp.809-813, May. 2012.
+
+\bibitem{multicycle}
+山口 久登，松薗 誠，佐藤 康夫，梶原 誠司 : 
+“スキャンBIST におけるマルチサイクルテストと部分観測方式の提案と評価" ，
+電子情報通信学会技術研究報告，DC2010-28，pp.31-36，2010-11 
+
+\bibitem{scantest}
+藤原 秀雄 : 
+“コンピュータの設計とテスト" ，
+工学図書 pp.221，1990
+
+\bibitem{transfault}
+梶原 誠司・佐藤 康夫 : 
+“論理回路に対する遅延テスト手法" ，
+https://www.jstage.jst.go.jp/article/essfr/1/3/1\_3\_3\_71/\_pdf
+
+\bibitem{multidemerit}
+J. Rearick, ”Too Much Delay Fault Coverage is a Bad Thing,” Proc. Int ’l Test
+Conf., Baltimore, MD, pp. 624-633, 2001. DOI: 10.1109/TEST.2001.966682
+
+\bibitem{FFtgl}
+Hanan T. Al-AWADHI, Tomoki AONO, Senling WANG, Yoshinobu HIGAMI, 
+Hiroshi TAKAHASHI, Hiroyuki IWATA, Yoichi MAEDA, Jun MATSUSHIMA, 
+”FF-Control Point Insertion (FF-CPI) to Overcome the Degradation of Fault Detection under Multi-Cycle Test for POST”，
+IEICE Transactions on Information and Systems, 2020, E103.D 巻, 11 号, p. 2289-2301, 
+公開日 2020/11/01, Online ISSN 1745-1361, Print ISSN 0916-8532
+
+%ここまで参考文献
+
+\end{thebibliography}
+\end{document}
