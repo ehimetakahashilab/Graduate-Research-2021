@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Algorithms with Python / LZT 符号</title>
+  <meta name="description" content="Python,アルゴリズム,データ構造,入門">
+  <link rel="stylesheet" type="text/css" href="../home2_styles.css">
+</head>
+<body>
+M.Hiroi's Home Page
+<div class="ce">
+<h1>Algorithms with Python</h1>
+<h2>LZT 符号</h2>
+<div class="small">
+[ <a href="pyalgo34.html">PrevPage</a> | <a href="index.html#python_algo">Python</a> | <a href="pyalgo36.html">NextPage</a> ]
+<hr>
+</div>
+</div>
+<section class="contents">
+<h3>はじめに</h3>
+<p> LZ78 符号 (LZW 符号) の続きです。前回作成した LZW 符号のプログラムは、辞書が満杯になった時点で辞書を固定して、あとはその辞書をそのまま使ってファイルを圧縮しました。ところが、この方法では不都合な場合があるのです。たとえば、データの種類が異なる複数のファイルをアーカイバでまとめてから圧縮することを考えてみましょう。途中で辞書が満杯になりデータの種類が変化すると、それ以降のデータはほとんど圧縮することができません。
+</p>
+
+<p> 実際に、<a href="http://corpus.canterbury.ac.nz/">Canterbury Corpus</a> で配布されている <a href="http://corpus.canterbury.ac.nz/descriptions/#cantrbry">The Canterbury Corpus</a> をアーカイバ tar でまとめたファイル canterbury.tar を LZW 符号で圧縮してみましょう。結果は次のようになりました。
+</p>
+<pre class="table">
+        表 : canterbury.tar の評価結果
+
+                              辞書サイズ
+ PROG    サイズ         8k        32k        128k
+----------------------------------------------------
+ LZW    2,821,120   2,408,719  2,648,284  1,194,042
+</pre>
+<p> このように、辞書サイズが小さい場合、ファイルを圧縮することはほとんどできません。この場合は、大域的な辞書を作成していることが裏目となり、データの変化についていけないのです。このような問題を解決するために、辞書が満杯になった時の対処方法がいくつか考案されています。今回はその中の一つである「LZT 符号」を取り上げます。
+</p>
+
+<h4>●LZT 符号</h4>
+<p> LZT 符号は 1987 年に Tischer によって開発されました。おもな改良点は、辞書が満杯になった場合、長い間使われていない (最長時間未使用 : Least Recently Used) 語を取り除くことで辞書の空きスペースを作るところです。このような操作を「LRU スキーム」と呼びます。
+</p>
+
+<p> LZT 符号は LRU スキームを行うため符号化と復号に時間がかかることになりますが、少ないメモリでも高い圧縮率を期待することができます。また、データの局所的な偏在も辞書に反映することが可能になります。
+</p>
+
+<p> 辞書の管理は「キュー (queue) 」を使って行うと簡単です。キューは先入れ先出し (FIFO) のデータ構造です。トライをたどっていくときに、通過した節をキューから取り出して最後尾へ移動します。そうすると、アクセスされない節ほどキューの先頭に集まることになるので、節を削除する場合はキューの先頭から行えばいいわけです。
+</p>
+
+<p> 一般に、キューはリングバッファや連結リストを使うと簡単に実装することができます。データの出し入れがキューの先頭と最後尾だけならば、これらのデータ構造で十分なのですが、キューの途中からデータを削除する場合には適しているとはいえません。
+</p>
+
+<p> リングバッファは配列を使って実装するので、削除した分だけデータを移動しないといけません。また、連結リストでデータを削除する場合、そのデータを保持しているセルと、ひとつ手前のセルの両方が必要になるので、リストの先頭から順番にセルをたどらないといけません。どちらの方法でも、キューの途中からデータを削除するには時間がかかるのです。
+</p>
+
+<p> そこで、今回は「双方向リスト」を使って節の順番を管理することにします。双方向リストは名前が示すように、直後のセルだけでなく直前のセルへの参照を持たせたデータ構造です。下図に双方向リストの構造を示します。
+</p>
+<!--
+<pre class="fig">
+     preV    NEXT      preV    NEXT      preV    NEXT
+    ┌─┬─┬─┐    ┌─┬─┬─┐    ┌─┬─┬─┐
+←─┼・│  │・│←─┼・│  │・│←─┼・│  │・│←─
+─→│・│  │・┼─→│・│  │・┼─→│・│  │・┼─→
+    └─┴─┴─┘    └─┴─┴─┘    └─┴─┴─┘
+         DATA              DATA              DATA
+
+
+                 図 1 : 双方向リスト
+</pre>
+-->
+<div class="img">
+<img src="img/awp3501.png">
+</div>
+
+<p> 双方向リストは拙作のページ <a href="pyalgo02.html">連結リストとキュー</a> で詳しく説明しています。よろしければ参考にしてください。
+</p>
+
+<h4>●ハッシュ法によるトライの実装</h4>
+<p> ところで、前回作成した LZW 符号のプログラムはトライを二分木のように構成しています。この方法では子を探す処理が線形探索になるため、記号の種類が多くなるほど処理に時間がかかる、という欠点があります。LZW 符号の高速化は、<a href="index.html#cite">参考文献 2</a> の LZ 法で次のように説明されています。参考文献 [2] より引用します。
+</p>
+<blockquote><cite>
+『より高速化するには、木のノード p の文字 c に当たる子の位置を見つけるために p, c によるハッシュ法を使う。』
+</cite></blockquote>
+<p> ようするに、節の子をハッシュ法で管理するわけです。親節の番号（辞書番号）と子の値（記号）を用いてハッシュ値を計算すると、一つのハッシュ表で節の子を管理することができます。
+</p>
+<p> Python の辞書 (ハッシュ) はタプルをキーにできるので、(辞書番号, 記号) のようにタプルにまとめれば簡単です。数値に変換する場合は次のようにするといいでしょう。
+</p>
+<pre class="list">
+リスト : ハッシュ関数
+
+def hash_func(n, c):
+    return ((n &lt;&lt; 8) + c) % HASH_SIZE
+</pre>
+<p> p が親の辞書番号、c が子の記号です。p を 8 ビットシフトして c を加算し、ハッシュ表の大きさ HASH_SIZE で割り算した余りをハッシュ値としています。とても簡単な方法ですが、これでも十分にハッシュ法は機能します。
+</p>
+<p> 今回はハッシュ法を使ってトライを実装することにしましょう。具体的な説明は、プログラムを作成するところで行います。なお、LZW 符号の高速化はハッシュ法だけではなく <a href="pyalgo10.html">Ternary Search Tree</a> を用いる方法もあります。M.Hiroi はＣ言語で試したことがあるのですが、テキストファイルでは Ternary Search Tree の方がハッシュ法よりも高速でした。興味のある方は挑戦してみてください。
+</p>
+<h4>●キューの作成</h4>
+<p> 最初はキューから作成しましょう。次のリストを見てください。
+</p>
+<pre class="list">
+リスト : 双方向リストによるキューの実装
+
+class Queue:
+    def __init__(self):
+        self.prev = [None] * DIC_SIZE
+        self.next = [None] * DIC_SIZE
+        self.prev[HEAD] = HEAD
+        self.next[HEAD] = HEAD
+</pre>
+<p> 今回作成するキューは辞書番号を管理すればいいので、双方向リストは配列を使って実装します。辞書番号を配列の添字に対応させ、配列 prev に一つ前のデータ (辞書番号) を格納し、next に一つ後ろの辞書番号を格納します。トライの節 x をアクセスした場合は、prev[x], next[x] を双方向リストから削除して、それを最後尾へ追加することで LRU スキームを実現することができます。
+</p>
+<p> それから、prev[0] と next[0] を双方向リストのヘッダとして使います。LZW 符号の場合、256 種類の記号は必ず辞書に登録されるので、0 番目から 255 番目の辞書番号は LRU スキームを行う必要はありません。これらの辞書番号は双方向リストに登録しないので、prev[0] と next[0] をヘッダに使っても問題ないわけです。変数 HEAD (0) がヘッダを表していて、prev[HEAD] と next[HEAD] を HEAD に初期化します。これでキューを空に初期化することができます。
+</p>
+
+<p> 次は、双方向リストの最後尾にデータを追加するメソッド insert を作ります。次のリストを見てください。
+</p>
+
+<pre class="list">
+リスト : キューの最後尾に追加
+
+    def insert(self, x):
+        last = self.prev[HEAD]
+        self.prev[x] = last
+        self.next[x] = HEAD
+        self.next[last] = x
+        self.prev[HEAD] = x
+</pre>
+<p> ヘッダから最後尾の辞書番号を取り出して last にセットします。この後ろに辞書番号 n を追加します。次の図を見てください。
+</p>
+<!--
+<pre class="fig">
+       L                 Header
+      ┌─┬─┬─┐    ┌─┬─┬─┐
+  ←─┼・│  │  │←─┼Ｌ│  │  │←─
+  ─→│  │  │Ｈ┼─→│  │  │・┼─→
+      └─┴─┴─┘    └─┴─┴─┘
+       preV    NEXT      preV    NEXT 
+
+       L と Header の間に N を追加する
+
+  (a) 挿入前
+
+       L                 N                 Header
+      ┌─┬─┬─┐    ┌─┬─┬─┐    ┌─┬─┬─┐
+  ←─┼・│  │  │←─┼Ｌ│  │  │←─┼Ｎ│  │  │←─
+  ─→│  │  │Ｎ┼─→│  │  │Ｈ┼─→│  │  │・┼─→
+      └─┴─┴─┘    └─┴─┴─┘    └─┴─┴─┘
+       preV    NEXT      preV    NEXT      preV    NEXT
+
+　(b) 挿入後
+
+
+               図 2 : 双方向リストへの挿入
+</pre>
+-->
+<div class="img">
+<img src="img/awp3502.png">
+</div>
+
+<p> Header の一つ後ろのセル L の後ろに N を追加します。L は Header の preV から求めることができます。N の preV に L をセットし、NEXT に Header をセットします。あとは、L の NEXT と Header の preV を N に書き換えます。プログラムでは、prev[n] に last をセットし、next[n] に HEAD をセットします。あとは、prev[HEAD] と next[last] を n に書き換えます。これで、HEAD と last の間に n を挿入することができます。
+</p>
+
+<p> 次は、双方向リストからデータを削除するメソッド delete を作ります。次のリストを見てください。
+</p>
+
+<pre class="list">
+リスト : キューからデータを削除する
+
+    def delete(self, n):
+        p = self.prev[n]
+        q = self.next[n]
+        self.next[p] = q
+        self.prev[q] = p
+</pre>
+<p> 辞書番号 n 自身の削除はとても簡単です。次の図を見てください。
+</p>
+<!--
+<pre class="fig">
+       P                 N                 Q
+      ┌─┬─┬─┐    ┌─┬─┬─┐    ┌─┬─┬─┐
+  ←─┼・│  │  │←─┼Ｐ│  │  │←─┼Ｎ│  │  │←─
+  ─→│  │  │Ｎ┼─→│  │  │Ｑ┼─→│  │  │・┼─→
+      └─┴─┴─┘    └─┴─┴─┘    └─┴─┴─┘
+       preV    NEXT      preV    NEXT      preV    NEXT
+
+       セル N を削除する
+
+  (a) 削除前
+
+
+       P                 Q
+      ┌─┬─┬─┐    ┌─┬─┬─┐    
+  ←─┼・│  │  │←─┼Ｐ│  │  │←─
+  ─→│  │  │Ｑ┼─→│  │  │・┼─→
+      └─┴─┴─┘    └─┴─┴─┘    
+       preV    NEXT      preV    NEXT     
+
+　(b) 削除後
+
+               図 3 : 双方向リストからの削除
+</pre>
+-->
+<div class="img">
+<img src="img/awp3503.png">
+</div>
+
+<p> セル N の直前のセルを P とし直後のセルを Q とすると、P の next を Q に、Q の preV を P に書き換えれば N を削除することができます。プログラムでは、prev[n] から p を求め、next[n] から q を求めます。あとは、next[p] を q に、prev[q] を p に書き換えます。これで n を削除することができます。
+</p>
+<p> 最後に、双方向リストの先頭からデータを求めるメソッド traverse を作ります。
+</p>
+
+<pre class="list">
+リスト : 巡回
+
+    def traverse(self):
+        n = self.next[HEAD]
+        while n != HEAD:
+            yield n
+            n = self.next[n]
+</pre>
+<p> traverse はジェネレータで実装しました。ヘッダから next を順番にたどっていき、yield で辞書番号を返します。
+</p>
+
+<h4>●辞書の作成</h4>
+<p> 次は辞書を表すクラス Dic を作成します。次のリストを見てください。
+</p>
+<pre class="list">
+リスト : 辞書の定義
+
+class Dic:
+    def __init__(self):
+        self.sym = [None] * DIC_SIZE
+        self.parent = [None] * DIC_SIZE
+        self.child = [0] * DIC_SIZE
+        self.ht = {}
+        for x in xrange(256): self.sym[x] = x
+        self.num = 256
+</pre>
+<p> 辞書は配列を使って実装します。配列の添字が辞書番号に対応します。sym は記号を格納し、parent は親の辞書番号を格納します。そして、child が子の個数を格納します。ht は親子関係を表すハッシュで、num は辞書番号を管理します。
+</p>
+<p> ハッシュを使ってトライを実装すると、節 (辞書番号) が「葉」なのかすぐに判別することができません。そこで、子の個数を配列 child で管理します。たとえば、n に子を追加するときは child[n] を +1 します。n の子を削除するときは child[n] を -1 します。child[n] が 0 の場合、n は葉であることがすぐにわかります。
+</p>
+<p> 次は記号 c を持つ子を探すメソッド search を作ります。
+</p>
+<pre class="list">
+リスト : 記号 c を持つ子を探す
+
+    def search(self, n, c):
+        key = (n, c)
+        if key in self.ht: return self.ht[key]
+        return None
+</pre>
+<p> search は n の子の中から記号 c を持つ子を探します。最初に、タプル (n, c) を変数 key にセットします。そして、key がハッシュ ht にある場合は、その値 ht[key] を返します。そうでなければ None を返します。探索にハッシュを使っているので、高速に動作することが期待できます。
+</p>
+
+<p> 次は子を挿入するメソッド insert を作ります。
+</p>
+<pre class="list">
+リスト : 記号 c を持つ子を挿入
+
+    def insert(self, q, p, c):
+        if self.num == DIC_SIZE:
+            n = self.search_leaf(q)
+            q.delete(n)
+            self.delete(n)
+        else:
+            n = self.num
+            self.num += 1
+        self.sym[n] = c
+        self.parent[n] = p
+        self.child[n] = 0
+        self.child[p] += 1
+        self.ht[(p, c)] = n
+        q.insert(n)
+</pre>
+<p> 引数 q はキュー、p が親の辞書番号、c が記号です。num が DIC_SIZE と等しい場合は辞書に空きがないので、メソッド search_leaf で最も使われていない「葉」をキューから探し出します。このとき、トライの途中にある節 (辞書番号) は、削除できないことに注意してください。見つけた葉を n にセットし、q.delete でキューから削除し、self.delete でトライから削除します。辞書に空きがある場合は、num が子の辞書番号になります。
+</p>
+<p> それから、sym[n] に記号 c をセットし、parent[n] に親 p をセットします。child[n] は 0 で初期化して、child[p] の値は +1 します。そして、ハッシュ ht[(p, c)] に n をセットします。これで、p と n の親子関係がリンクされます。最後に、キューの最後尾に n を追加します。
+</p>
+
+<p> 次は、キューの先頭から葉を探すメソッド search_leaf と削除するメソッド delete を作ります。
+</p>
+<pre class="list">
+リスト : 葉の探索と削除
+
+    # 探索
+    def search_leaf(self, q):
+        for x in q.traverse():
+            if self.child[x] == 0: return x
+        return None
+
+    # 削除
+    def delete(self, n):
+        p = self.parent[n]
+        c = self.sym[n]
+        del self.ht[(p, c)]
+        self.child[p] -= 1
+</pre>
+
+<p> search_leaf の引数 q はキューを表します。葉を探す処理は簡単です。キューのメソッド traverse を使って、辞書番号 x を取り出します。child[x] が 0 ならば return で x を返します。見つからない場合は None を返していますが、必ず見つかるはずなので、raise でエラーを送出してもいいでしょう。
+</p>
+<p> delete の引数 n は削除する辞書番号です。まず、parent[n] から親を、sym[n] から記号を求めて、変数 p, c にセットします。そして、ハッシュ ht からキー (p, c) を削除し、child[p] を -1 します。これでトライから n を削除することができます。
+</p>
+
+<h4>●符号化のプログラム</h4>
+<p> 次は符号化を行う関数 encode を作ります。
+</p>
+
+<pre class="list">
+リスト : LZT 符号の符号化
+
+def encode(fin, fout):
+    dic = Dic()
+    que = Queue()
+    p = getc(fin)
+    while True:
+        c = getc(fin)
+        if c is None:
+            encode1(fout, p)
+            break
+        q = dic.search(p, c)
+        if q is None:
+            encode1(fout, p)
+            dic.insert(que, p, c)
+            p = c
+        else:
+            que.delete(q)
+            que.insert(q)
+            p = q
+</pre>
+<p> 引数 fin は入力ファイル、fout が出力ファイル (BitIO のオブジェクト) です。最初に、辞書 Dic のオブジェクトとキュー Queue のオブジェクトを生成して、変数 dic と que にセットします。次に、fin から 1 記号読み込んで変数 p にセットします。p が一つ前の辞書番号を保持します。
+</p>
+<p> 次の while ループで符号化を行います。fin から 1 記号読み込んで変数 c にセットします。c が None の場合、p が最長一致系列になるので、encode1 で p を符号化して break でループを終了します。そうでなければ dic.search を呼び出して、p に記号 c を持つ子がないか探索します。
+</p>
+<p> q が None の場合、p が最長一致系列になるので、encode1 で p を符号化します。そして、dic.insert で p に記号 c を持つ子を追加します。子 q が見つかった場合、q を que.delete でキューから削除し、que.insert で最後尾に追加します。これで LRU スキームを行うことができます。
+</p>
+
+<h4>●復号のプログラム</h4>
+<p> 次は復号を行う関数 decode を作ります。
+</p>
+
+<pre class="list">
+リスト : LZT 符号の復号
+
+def decode(fin, fout, size):
+    que = Queue()
+    dic = Dic()
+    p = decode1(fin)
+    c, i = dic.output(que, p, fout)
+    size -= i
+    while size &gt; 0:
+        q = decode1(fin)
+        if dic.check_code(que, q):
+            c, i = dic.output(que, q, fout)
+            dic.insert(que, p, c)
+        else:
+            dic.insert(que, p, c)
+            c, i = dic.output(que, q, fout)
+        p = q
+        size -= i
+</pre>
+<p> LZT 符号の場合、復号でも符号化と同じタイミングで LRU スキームを行う必要があります。このため、今回は復号の処理でも辞書 Dic を使うことにします。最初に、辞書 Dic とキュー Queue のオブジェクトを生成して、変数 que と dic にセットします。次に、decode1 で辞書番号を復号して変数 p にセットし、Dic のメソッド output で記号列に復号します。output の返り値は LZW 符号と同じで、記号列の先頭文字と記号列の長さです。
+</p>
+<p> それから while ループで復号処理を行います。ポイントは decode1 で復号した辞書番号 q が辞書に登録されているかチェックするところです。LZW 符号では簡単にチェックすることができましたが、LZT 符号では辞書番号を削除して再登録するときにもチェックが必要になります。この処理を Dic のメソッド check_code で行います。
+</p>
+
+<pre class="list">
+リスト : 辞書番号のチェック
+
+    def check_code(self, q, n):
+        if self.num == DIC_SIZE:
+            return self.search_leaf(q) != n
+        return n &lt; self.num
+</pre>
+<p> まず、辞書が満杯かチェックします。満杯でなければ LZW 符号と同じく、n &lt; self.num であれば、復号した n は辞書に登録されています。return で n &lt; self.num の結果を返します。
+</p>
+<p> 辞書が満杯の場合は、最も使われていない葉を削除することになります。これから削除する葉と復号した n が同じ場合は、その n はまだ辞書に登録されていません。削除される葉は search_leaf で求めることができます。この返り値と n が異なっていれば True を返します。そうでなければ False を返します。
+</p>
+
+<p> 最後に Dic のメソッド output を作ります。
+</p>
+
+<pre class="list">
+リスト : 記号列の出力
+
+    def output(self, q, n, fout):
+        if self.parent[n] is None:
+            putc(fout, n)
+            return n, 1
+        else:
+            m, i = self.output(q, self.parent[n], fout)
+            putc(fout, self.sym[n])
+            q.delete(n)
+            q.insert(n)
+            return m, i + 1
+</pre>
+<p> output の引数 q がキューで、n が辞書番号、fout が出力ファイルです。注意する点は、符号化したときと同じ順番で節を双方向リストの最後尾へ移動することです。output を再帰呼び出しして、記号 sym[n] を出力します。そのあとで、q.delete で n を削除し、q.insert で最後尾に n を追加します。これで LRU スキームを行うことができます。
+</p>
+
+<ul>
+  <li><a href="#list1">プログラムリスト１</a>
+</ul>
+<h4>●評価結果</h4>
+<p> それでは、実際にファイルを圧縮してみましょう。最初に The Canterbury Corpus をアーカイバ tar でまとめた canterbury.tar の結果を表に示します。
+</p>
+<pre class="table">
+        表 : canterbury.tar の評価結果
+
+                              辞書サイズ
+ PROG    サイズ         8k        32k        128k
+----------------------------------------------------
+ LZW    2,821,120   2,408,719  2,648,284  1,194,042
+ LZT    2,821,120     897,252    900,221    945,126
+</pre>
+<p> LZT 符号は LZW 符号よりも高い圧縮率になりました。LZT 符号の LRU スキームは大きな効果を発揮していることがわかります。次は The Canterbury Corpus の評価結果を表に示します。
+</p>
+<pre class="table">
+    表 : LZT 符号の評価結果 (辞書サイズ 8k)
+
+  ファイル名      サイズ     LZW      LZT    符号化  復号
+  --------------------------------------------------------
+  alice29.txt    152,089    68,448   64,193   2.62   2.73
+  asyoulik.txt   125,179    59,085   56,937   2.29   2.35
+  cp.html         24,603    12,150   11.111   0.45   0.43
+  fields.c        11,150     5,760    4,810   0.21   0.20
+  grammar.lsp      3,721     2,294    1,747   0.10   0.07
+  kennedy.xls  1,029,744   339,542  274,242  13.93  14.17
+  lcet10.txt     426,754   194,996  180,431   7.45   7.76
+  plrabn12.txt   481,861   220,850  215,221   8.67   9.07
+  ptt5           513,216    66,101   61,407   5.10   5.06
+  sum             38,240    30,163   19,364   0.74   0.73
+  xargs.1          4,227     2,916    2,249   0.09   0.09
+  --------------------------------------------------------
+  合計         2,810,784 1,002,305  891,716  41.65  42.66
+
+符号化と復号の単位 : 秒
+実行環境 : Windows XP, celeron 1.40 GHz, Python 2.4.2
+</pre>
+<p> 辞書サイズが 8 k の場合、LZT 符号の圧縮率は LZW 符号よりも高くなりました。辞書が小さくでも LRU スキームの効果により、LZT 符号は高い圧縮率を達成できることがわかります。符号化と復号の処理時間は、LZW 符号よりも遅くなりました。LZT 符号は LRU スキームを行っているので、その分だけ LZW 符号よりも時間がかかるのはしかたがありません。
+</p>
+<p> 次は辞書サイズを増やして試してみました。結果は次のようになります。
+</p>
+<pre class="table">
+    表 : LZT 符号の評価結果 (2)
+
+  ファイル名      サイズ     8 k      32 k     64 k
+  ---------------------------------------------------
+  alice29.txt    152,089    64,193   61.097   60,513
+  asyoulik.txt   125,179    56,937   54,117   53,206
+  cp.html         24,603    11.111   10,877   10,877
+  fields.c        11,150     4,810    4,810    4,810
+  grammar.lsp      3,721     1,747    1,747    1,747
+  kennedy.xls  1,029,744   274,242  303,277  316,931
+  lcet10.txt     426,754   180,431  163,278  159,994
+  plrabn12.txt   481,861   215,221  198,821  194,643
+  ptt5           513,216    61,407   61,064   60,333
+  sum             38,240    19,364   19,473   19,473
+  xargs.1          4,227     2,249    2,249    2,249
+  ---------------------------------------------------
+  合計         2,810,784   891,716  880,810  884,776
+</pre>
+<p> 辞書サイズを増やすとテキストファイルの圧縮率は向上しますが、kennedy.xls のように圧縮率が低下するファイルもあります。LZB 符号に比べると、辞書サイズを増やしても圧縮率はそれほど高くなりません。LZT 符号の場合、辞書サイズが小さいときは LRU スキームが効果的に働くのですが、辞書サイズが大きくなると LRU スキームの効果は少なくなるようです。
+</p>
+
+<p> なお、実行時間の結果は M.Hiroi のコーディング、実行したマシン、プログラミング言語などの環境に大きく依存しています。また、これらの環境だけではなく、データの種類によっても実行時間はかなり左右されます。興味のある方は、いろいろなデータをご自分の環境で試してみてください。
+</p>
+
+<h4>●LZT 符号とハフマン符号の組み合わせ</h4>
+<p> ところで、LZSS 符号とハフマン符号を組み合わせた LZH 符号は、二段階目のハフマン符号の効果が大きく、高い圧縮率を達成することができました。それでは、LZT 符号とハフマン符号を組み合わせるとどうなるのでしょうか。実際に試してみましょう。
+</p>
+<p> 今回の方法は、辞書番号をγ符号のようにビット数とビット列に分け、ビット数をハフマン符号で符号化します。プログラムの説明は割愛いたしますので、詳細は <a href="#list2">プログラムリスト２</a> をお読みください。
+</p>
+<p> 実行結果は次のようになりました。
+</p>
+<pre class="table">
+    表 : LZT 符号 + ハフマン符号の評価結果
+
+  ファイル名      サイズ     8 k      32 k     64 k
+  ---------------------------------------------------
+  alice29.txt    152,089    64,311   62.210   62.292 
+  asyoulik.txt   125,179    57,076   55,074   55,074 
+  cp.html         24,603    11.369   11,369   11,369 
+  fields.c        11,150     5,114    5,144    5,144 
+  grammar.lsp      3,721     1,832    1,832    1,832 
+  kennedy.xls  1,029,744   269,891  281,721  286,480 
+  lcet10.txt     426,754   180,242  164,269  161,511 
+  plrabn12.txt   481,861   215,001  199,219  195,599 
+  ptt5           513,216    61,251   61,598   61,761 
+  sum             38,240    19,383   20,533   20,533 
+  xargs.1          4,227     2,330    2,330    2,330 
+  ---------------------------------------------------
+  合計         2,810,784   887,800  865,269  863,895 
+</pre>
+<p> kennedy.xls のように圧縮率が高くなるファイルもありますが、圧縮率が低下するファイルが多くなりました。LZT 符号の場合、ハフマン符号と単純に組み合わせるだけでは、高い圧縮率を達成するのは難しいようです。興味のある方はいろいろ試してみてください。
+</p>
+<h4 id="cite">●参考文献</h4>
+<ol>
+  <li>植松友彦, 『文書データ圧縮アルゴリズム入門』, ＣＱ出版社, 1994
+  <li>広井誠, 『LZ78 符号によるファイルの圧縮と改良（前編）』, Interface 2006 年 11 月号, ＣＱ出版社
+</ol>
+<hr>
+<h4 id="list1">●プログラムリスト１</h4>
+<pre class="slist">
+# coding: utf-8
+#
+# lzt.py : LZT coding + CBT coding
+#
+#          Copyright (C) 2007 Makoto Hiroi
+#
+import time, sys, getopt, os.path
+from bitio import *
+
+# 定数
+DIC_BITS = 16
+DIC_SIZE = 1 &lt;&lt; DIC_BITS
+HEAD = 0
+
+
+# 双方向リストによるキュー
+# 0 がヘッダ, 1 - 255 はダミー
+class Queue:
+    def __init__(self):
+        self.prev = [None] * DIC_SIZE
+        self.next = [None] * DIC_SIZE
+        self.prev[HEAD] = HEAD
+        self.next[HEAD] = HEAD
+
+    # 最後尾に追加
+    def insert(self, x):
+        last = self.prev[HEAD]
+        self.prev[x] = last
+        self.next[x] = HEAD
+        self.next[last] = x
+        self.prev[HEAD] = x
+
+    # 削除
+    def delete(self, x):
+        p = self.prev[x]
+        q = self.next[x]
+        self.next[p] = q
+        self.prev[q] = p
+
+    # 巡回
+    def traverse(self):
+        n = self.next[HEAD]
+        while n != HEAD:
+            yield n
+            n = self.next[n]
+
+# 辞書
+class Dic:
+    def __init__(self):
+        self.sym = [None] * DIC_SIZE
+        self.parent = [None] * DIC_SIZE
+        self.child = [0] * DIC_SIZE
+        self.ht = {}
+        for x in xrange(256): self.sym[x] = x
+        self.num = 256
+
+    # 探索
+    def search(self, n, c):
+        key = (n, c)
+        if key in self.ht: return self.ht[key]
+        return None
+
+    # 葉を探す
+    def search_leaf(self, q):
+        for x in q.traverse():
+            if self.child[x] == 0: return x
+        return None
+
+    # 削除
+    def delete(self, n):
+        p = self.parent[n]
+        c = self.sym[n]
+        del self.ht[(p, c)]
+        self.child[p] -= 1
+
+    # 挿入
+    def insert(self, q, p, c):
+        if self.num == DIC_SIZE:
+            n = self.search_leaf(q)
+            q.delete(n)
+            self.delete(n)
+        else:
+            n = self.num
+            self.num += 1
+        self.sym[n] = c
+        self.parent[n] = p
+        self.child[n] = 0
+        self.child[p] += 1
+        self.ht[(p, c)] = n
+        q.insert(n)
+
+    # 辞書番号のチェック
+    def check_code(self, q, n):
+        if self.num == DIC_SIZE:
+            return self.search_leaf(q) != n
+        return n &lt; self.num
+    
+    # 出力
+    def output(self, q, n, fout):
+        if self.parent[n] is None:
+            putc(fout, n)
+            return n, 1
+        else:
+            m, i = self.output(q, self.parent[n], fout)
+            putc(fout, self.sym[n])
+            q.delete(n)
+            q.insert(n)
+            return m, i + 1
+
+# 符号語長
+dic_bits = 9
+code_count = 256
+
+# 辞書番号の符号化
+def encode1(fout, n):
+    global dic_bits, code_count
+    if dic_bits &lt; DIC_BITS:
+        fout.cbt_encode(n, code_count, dic_bits)
+        code_count += 1
+        if code_count &gt; (1 &lt;&lt; dic_bits) - 1: dic_bits += 1
+    else:
+        fout.putbits(DIC_BITS, n)
+
+# 辞書番号の復号
+def decode1(fin):
+    global dic_bits, code_count
+    if dic_bits &lt; DIC_BITS:
+        n = fin.cbt_decode(code_count, dic_bits)
+        code_count += 1
+        if code_count &gt; (1 &lt;&lt; dic_bits) - 1: dic_bits += 1
+    else:
+        n = fin.getbits(DIC_BITS)
+    return n
+
+
+# LZT 符号の符号化
+def encode(fin, fout):
+    dic = Dic()
+    que = Queue()
+    p = getc(fin)
+    while True:
+        c = getc(fin)
+        if c is None:
+            encode1(fout, p)
+            break
+        q = dic.search(p, c)
+        if q is None:
+            encode1(fout, p)
+            dic.insert(que, p, c)
+            p = c
+        else:
+            que.delete(q)
+            que.insert(q)
+            p = q
+
+
+# LZT 符号の復号
+def decode(fin, fout, size):
+    que = Queue()
+    dic = Dic()
+    p = decode1(fin)
+    c, i = dic.output(que, p, fout)
+    size -= i
+    while size &gt; 0:
+        q = decode1(fin)
+        if dic.check_code(que, q):
+            c, i = dic.output(que, q, fout)
+            dic.insert(que, p, c)
+        else:
+            dic.insert(que, p, c)
+            c, i = dic.output(que, q, fout)
+        p = q
+        size -= i
+
+# 符号化
+def encode_file(name1, name2):
+    size = os.path.getsize(name1)
+    infile = open(name1, "rb")
+    outfile = BitIO(name2, WOPEN)
+    outfile.putbits(32, size)
+    if size &gt; 0: encode(infile, outfile)
+    infile.close()
+    outfile.close()
+
+# 復号
+def decode_file(name1, name2):
+    infile = BitIO(name1, ROPEN)
+    outfile = open(name2, "wb")
+    size = infile.getbits(32)
+    if size &gt; 0: decode(infile, outfile, size)
+    infile.close()
+    outfile.close()
+
+#
+def main():
+    eflag = False
+    dflag = False
+    opts, args = getopt.getopt(sys.argv[1:], 'ed')
+    for x, y in opts:
+        if x == '-e' or x == '-E':
+            eflag = True
+        elif x == '-d' or x == '-D':
+            dflag = True
+    if eflag and dflag:
+        print 'option error'
+    elif eflag:
+        encode_file(args[0], args[1])
+    elif dflag:
+        decode_file(args[0], args[1])
+    else:
+        print 'option error'
+
+#
+s = time.clock()
+main()
+e = time.clock()
+print "%.3f" % (e - s)
+</pre>
+<hr>
+<h4 id="list2">●プログラムリスト２</h4>
+<pre class="slist">
+# coding: utf-8
+#
+# lzth.py : LZT coding + Huffman coding
+#
+#           Copyright (C) 2007 Makoto Hiroi
+#
+import time, sys, getopt, os.path
+from bitio import *
+from pqueue import *
+
+# 定数
+DIC_BITS = 13
+DIC_SIZE = 1 &lt;&lt; DIC_BITS
+HEAD = 0
+
+HUFF_BITS = 14
+HUFF_SIZE = 1 &lt;&lt; HUFF_BITS
+CODE_BITS = 5
+
+
+##### Huffman coding #####
+
+# ハフマン木の節
+class Node:
+    def __init__(self, code, count = 0, left = None, right = None):
+        self.code = code
+        self.count = count
+        self.left = left
+        self.right = right
+
+    def __cmp__(x, y):
+        return x.count - y.count
+
+# 符号の生成
+def make_code(table, node, n, code):
+    if node.code is not None:
+        # 葉
+        table[node.code] = (n, code)
+    else:
+        make_code(table, node.left, n + 1, code &lt;&lt; 1)         # left  is 0
+        make_code(table, node.right, n + 1, (code &lt;&lt; 1) | 1)  # right is 1
+
+# ハフマン木の出力
+def write_tree(node, fout):
+    if node.code is not None:
+        # 葉
+        fout.putbit(1)
+        fout.putbits(CODE_BITS, node.code)
+    else:
+        fout.putbit(0)
+        write_tree(node.left, fout)
+        write_tree(node.right, fout)
+
+# ハフマン木の読み込み
+def read_tree(fin):
+    if fin.getbit() == 1:
+        # 葉
+        node = Node(fin.getbits(CODE_BITS))
+    else:
+        node = Node(None)
+        node.left = read_tree(fin)
+        node.right = read_tree(fin)
+    return node
+
+# ハフマン木の生成
+def make_tree(sym_table):
+    q = PQueue()   # ヒープの生成
+    for x in sym_table:
+        if x.count &gt; 0: q.push(x)
+    while True:
+        n1 = q.pop()
+        if q.isEmpty(): return n1
+        n2 = q.pop()
+        q.push(Node(None, n1.count + n2.count, n1, n2))
+
+# ビット数を求める
+def get_bit_num(n):
+    n1 = 0
+    n2 = (n + 1) &gt;&gt; 1
+    while n2 &gt; 0:
+        n1 += 1
+        n2 &gt;&gt;= 1
+    return n1
+
+# ハフマン符号化
+def huff_encode(buff, size, fout):
+    count = [Node(x) for x in xrange(DIC_BITS + 1)]
+    code = [None] * (DIC_BITS + 1)
+    # 出現頻度表の作成
+    for x in xrange(size):
+        n = buff[x]
+        n1 = get_bit_num(n)
+        count[n1].count += 1
+    # ハフマン木の生成と出力
+    root = make_tree(count)
+    make_code(code, root, 0, 0)
+    fout.putbits(HUFF_BITS, size - 1)
+    write_tree(root, fout)
+    # 符号化
+    for x in xrange(size):
+        n = buff[x]
+        n1 = get_bit_num(n)
+        fout.putbits(*code[n1])
+        if n1 &gt; 0: fout.putbits(n1, n + 1)
+
+# 記号の復号
+def huff_decode_sub(node, fin):
+    while node.code is None:
+        if fin.getbit() == 0:
+            node = node.left
+        else:
+            node = node.right
+    return node.code
+
+# ハフマン復号
+def huff_decode(buff, fin):
+    size = fin.getbits(HUFF_BITS) + 1
+    root = read_tree(fin)
+    for x in xrange(size):
+        n = huff_decode_sub(root, fin)
+        if n &gt; 0:
+            n = (1 &lt;&lt; n) + fin.getbits(n) - 1
+        buff[x] = n
+    return size
+
+##### LZT 符号 #####
+
+# 双方向リストによるキュー
+# 0 がヘッダ, 1 - 255 はダミー
+class Queue:
+    def __init__(self):
+        self.prev = [None] * DIC_SIZE
+        self.next = [None] * DIC_SIZE
+        self.prev[HEAD] = HEAD
+        self.next[HEAD] = HEAD
+
+    # 最後尾に追加
+    def insert(self, x):
+        last = self.prev[HEAD]
+        self.prev[x] = last
+        self.next[x] = HEAD
+        self.next[last] = x
+        self.prev[HEAD] = x
+
+    # 削除
+    def delete(self, x):
+        p = self.prev[x]
+        q = self.next[x]
+        self.next[p] = q
+        self.prev[q] = p
+
+    # 巡回
+    def traverse(self):
+        n = self.next[HEAD]
+        while n != HEAD:
+            yield n
+            n = self.next[n]
+
+# 辞書
+class Dic:
+    def __init__(self):
+        self.sym = [None] * DIC_SIZE
+        self.parent = [None] * DIC_SIZE
+        self.child = [0] * DIC_SIZE
+        self.ht = {}
+        for x in xrange(256): self.sym[x] = x
+        self.num = 256
+
+    # 探索
+    def search(self, n, c):
+        key = (n, c)
+        if key in self.ht: return self.ht[key]
+        return None
+
+    # 葉を探す
+    def search_leaf(self, q):
+        for x in q.traverse():
+            if self.child[x] == 0: return x
+        return None
+
+    # 削除
+    def delete(self, n):
+        p = self.parent[n]
+        c = self.sym[n]
+        del self.ht[(p, c)]
+        self.child[p] -= 1
+
+    # 挿入
+    def insert(self, q, p, c):
+        if self.num == DIC_SIZE:
+            n = self.search_leaf(q)
+            q.delete(n)
+            self.delete(n)
+        else:
+            n = self.num
+            self.num += 1
+        self.sym[n] = c
+        self.parent[n] = p
+        self.child[n] = 0
+        self.child[p] += 1
+        self.ht[(p, c)] = n
+        q.insert(n)
+
+    # 辞書番号のチェック
+    def check_code(self, q, n):
+        if self.num == DIC_SIZE:
+            return self.search_leaf(q) != n
+        return n &lt; self.num
+    
+    # 出力
+    def output(self, q, n, fout):
+        if self.parent[n] is None:
+            putc(fout, n)
+            return n, 1
+        else:
+            m, i = self.output(q, self.parent[n], fout)
+            putc(fout, self.sym[n])
+            q.delete(n)
+            q.insert(n)
+            return m, i + 1
+
+# LZT 符号の符号化
+def encode(fin, fout):
+    huff_buff = [None] * HUFF_SIZE
+    hcnt = 0
+    dic = Dic()
+    que = Queue()
+    p = getc(fin)
+    while True:
+        c = getc(fin)
+        if c is None:
+            huff_buff[hcnt] = p
+            hcnt += 1
+            huff_encode(huff_buff, hcnt, fout)
+            break
+        q = dic.search(p, c)
+        if q is None:
+            huff_buff[hcnt] = p
+            hcnt += 1
+            if hcnt == HUFF_SIZE:
+                huff_encode(huff_buff, hcnt, fout)
+                hcnt = 0
+            dic.insert(que, p, c)
+            p = c
+        else:
+            que.delete(q)
+            que.insert(q)
+            p = q
+
+
+# LZT 符号の復号
+def decode(fin, fout, size):
+    que = Queue()
+    dic = Dic()
+    huff_buff = [None] * HUFF_SIZE
+    hsize = huff_decode(huff_buff, fin)
+    hcnt = 1
+    p = huff_buff[0]
+    c, i = dic.output(que, p, fout)
+    size -= i
+    while size &gt; 0:
+        if hcnt == hsize:
+            hsize = huff_decode(huff_buff, fin)
+            hcnt = 0
+        q = huff_buff[hcnt]
+        hcnt += 1
+        if dic.check_code(que, q):
+            c, i = dic.output(que, q, fout)
+            dic.insert(que, p, c)
+        else:
+            dic.insert(que, p, c)
+            c, i = dic.output(que, q, fout)
+        p = q
+        size -= i
+
+# 符号化
+def encode_file(name1, name2):
+    size = os.path.getsize(name1)
+    infile = open(name1, "rb")
+    outfile = BitIO(name2, WOPEN)
+    outfile.putbits(32, size)
+    if size &gt; 0: encode(infile, outfile)
+    infile.close()
+    outfile.close()
+
+# 復号
+def decode_file(name1, name2):
+    infile = BitIO(name1, ROPEN)
+    outfile = open(name2, "wb")
+    size = infile.getbits(32)
+    if size &gt; 0: decode(infile, outfile, size)
+    infile.close()
+    outfile.close()
+
+#
+def main():
+    eflag = False
+    dflag = False
+    opts, args = getopt.getopt(sys.argv[1:], 'ed')
+    for x, y in opts:
+        if x == '-e' or x == '-E':
+            eflag = True
+        elif x == '-d' or x == '-D':
+            dflag = True
+    if eflag and dflag:
+        print 'option error'
+    elif eflag:
+        encode_file(args[0], args[1])
+    elif dflag:
+        decode_file(args[0], args[1])
+    else:
+        print 'option error'
+
+#
+s = time.clock()
+main()
+e = time.clock()
+print "%.3f" % (e - s)
+</pre>
+</section>
+<hr>
+<div class="ce">
+<b>Copyright (C) 2007 Makoto Hiroi<br>All rights reserved.</b>
+<div class="small">
+<hr>
+[ <a href="pyalgo34.html">PrevPage</a> | <a href="index.html#python_algo">Python</a> | <a href="pyalgo36.html">NextPage</a> ]
+</div>
+</div>
+</body>
+</html>

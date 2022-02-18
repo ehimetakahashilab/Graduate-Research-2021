@@ -1,0 +1,300 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns:og="http://ogp.me/ns#" xmlns:fb="http://www.facebook.com/2008/fbml" xmlns:mixi="http://mixi-platform.com/ns#" lang="ja" dir="ltr">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="imagetoolbar" content="no">
+<title>DNSサービス「Dyn」への大規模DDoS攻撃、発信源は10万台のIoT機器 - Computerworldニュース：Computerworld</title>
+<meta name="viewport" content="width=1024">
+<meta name="copyright" content="日経BP社,nikkei BPnet">
+<meta name="UniqContentsId" content="00009K5q">
+<link rel="SHORTCUT ICON" href="/images/idg/computerworld/common/favicon.ico">
+<link rel="stylesheet" type="text/css" href="/css/idg/computerworld/style.css" media="all">
+<script type="text/javascript" src="/js/bpcommon/jquery-1.x.min.js"></script>
+<script type="text/javascript" src="/js/idg/computerworld/libs/jquery.page-scroller.js"></script>
+<script type="text/javascript" src="/js/idg/computerworld/common.js" charset="UTF-8"></script>
+<meta property="og:title" content="">
+<meta property="og:type" content="website">
+<meta property="og:description" content="">
+<meta property="og:url" content="">
+<meta property="og:image" content="">
+<meta property="og:site_name" content="">
+<meta property="fb:app_id" content="">
+<!-- Start TagManager -->
+<script src="https://assets.adobedtm.com/570a621a24b47ab0c04225f491ed07679e91176f/satelliteLib-16bde42aeada259a187ccea0c654441c7a78e7a8.js"></script>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-PXP529Z');</script>
+<!-- End TagManager --><script async='async' src='https://securepubads.g.doubleclick.net/tag/js/gpt.js'></script>
+<script type='text/javascript'>
+
+var googletag = googletag || {};
+googletag.cmd = googletag.cmd || [];
+</script>
+
+
+<script type='text/javascript'>
+window.Krux||((Krux=function(){Krux.q.push(arguments);}).q=[]);
+(function(){
+ function retrieve(n){
+  var m, k='kx'+n;
+  if (window.localStorage) {
+   return window.localStorage[k] || "";
+  } else if (navigator.cookieEnabled) {
+   m = document.cookie.match(k+'=([^;]*)');
+   return (m && unescape(m[1])) || "";
+  } else {
+   return '';
+  }
+ }
+ Krux.user = retrieve('kuid');
+ Krux.segments = retrieve('segs') && retrieve('segs').split(',') || [];
+})();
+</script>
+<script type="text/javascript">
+var dag_adslots = [];
+  googletag.cmd.push(function() {
+   googletag.pubads().setTargeting('NXT_other_asyncserial','24bbc99986');
+   googletag.pubads().setTargeting('CMStheme','idg-cm-network');
+   googletag.pubads().setTargeting('curtDN', location.hostname );
+   googletag.pubads().setTargeting('refDN', document.referrer.split('/')[2] || [] );
+   googletag.pubads().setTargeting('extPF', (function(q,k){var kv=q.split(k+"=")[1];if(kv){return kv.split("&")[0];}}(location.search,"extpf")) || []);
+   googletag.pubads().setTargeting('page', 'F');
+   googletag.pubads().setTargeting('CMSauth', 'FREEAUTHOK');
+   googletag.pubads().setTargeting('a1', ['noseg']);
+   googletag.pubads().setTargeting('Kr', Krux.segments );
+dag_adslots.rectangle1 = googletag.defineSlot('/54271731/nxt/rectangle1/idg/computerworld', [[300, 250], [300, 300], [300, 600]], 'div-gpt-ad-rectangle1').addService(googletag.pubads()).setCollapseEmptyDiv(true,true);
+googletag.pubads().enableSingleRequest();
+    googletag.enableServices();
+    
+  });
+</script></head>
+<body>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+   var js, fjs = d.getElementsByTagName(s)[0];
+   if (d.getElementById(id)) return;
+   js = d.createElement(s); js.id = id;
+   js.src = "//connect.facebook.net/ja_JP/sdk.js#xfbml=1&version=v2.8";
+   fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+<div id="North">
+<div id="header">
+<div id="head_content">
+<h1><a href="/idg/computerworld/"><img src="/images/idg/computerworld/common/logo.png" alt="Computerworld" width="240" height="60"></a></h1>
+</div>
+<div id="hnav">
+<ul>
+<li><a href="/idg/computerworld/"><img src="/images/idg/computerworld/common/hnav/top_off.png" alt="TOP" width="73" height="40"></a></li>
+<li><a href="/idg/computerworld/software.html"><img src="/images/idg/computerworld/common/hnav/software_off.png" alt="Software" width="117" height="40"></a></li>
+<li><a href="/idg/computerworld/hardware.html"><img src="/images/idg/computerworld/common/hnav/hardware_off.png" alt="Hardware" width="120" height="40"></a></li>
+<li><a href="/idg/computerworld/cloud.html"><img src="/images/idg/computerworld/common/hnav/cloud_off.png" alt="Cloud" width="88" height="40"></a></li>
+<li><a href="/idg/computerworld/network.html"><img src="/images/idg/computerworld/common/hnav/network_on.png" alt="Network" width="111" height="40"></a></li>
+<li><a href="/idg/computerworld/wireless.html"><img src="/images/idg/computerworld/common/hnav/wireless_off.png" alt="Wireless" width="114" height="40"></a></li>
+<li><a href="/idg/computerworld/industries.html"><img src="/images/idg/computerworld/common/hnav/industries_off.png" alt="Industries" width="125" height="40"></a></li>
+<li><a href="/idg/ciomagazine/"><img src="/images/idg/computerworld/common/hnav/cio_off.png" alt="CIO" width="76" height="40"></a></li>
+<li><a href="https://tech.nikkeibp.co.jp/" target="_blank"><img src="/images/idg/computerworld/common/hnav/nxt_off.png" alt="日経 xTECH" width="60" height="40"></a></li>
+</ul>
+</div><!--// hnav -->
+</div><!--// header -->
+</div><!--// North -->
+
+<div id="Contentia">
+<div id="mainContent">
+<p class="topic_path"><a href="/idg/computerworld/">TOP</a> ＞ <a href="/idg/computerworld/network.html">Network</a> ＞ DNSサービス「Dyn」への大規模DDoS攻撃、発信源は10...</p>
+
+<h2 class="category_head"><img src="/images/idg/computerworld/category/network.png" alt="Network" width="540" height="27"></h2>
+
+<p class="head_category_link">関連カテゴリー：
+<a href="/idg/computerworld/software.html">Software</a>
+
+｜
+<a href="/idg/computerworld/industries.html">Industries</a>
+</p>
+
+
+<div id="kiji_header">
+<h2>DNSサービス「Dyn」への大規模DDoS攻撃、発信源は10万台のIoT機器</h2>
+<p class="subtitle"></p>
+<div class="data">
+<div class="socialBtnArea">
+<ul>
+<li><div class="fb-share-button" data-href="https://project.nikkeibp.co.jp/idg/atcl/idg/14/481542/102800290/" data-layout="button_count" data-width="100" data-show-faces="false"></div></li>
+<li><a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-text="DNSサービス「Dyn」への大規模DDoS攻撃、発信源は10万台のIoT機器" data-url="https://project.nikkeibp.co.jp/idg/atcl/idg/14/481542/102800290/" data-via="nikkeibpITpro" data-lang="ja">Tweet</a><script type="text/javascript" src="https://platform.twitter.com/widgets.js" charset="UTF-8"></script></li>
+</ul>
+</div><!-- /.socialBtnArea -->
+<p class="pubdate">2016/10/28</p>
+<p id="author">
+Michael Kan IDG News Service</p>
+</div>
+</div><!--// kiji_header-->
+
+
+<div id="kiji">
+<p class="bplead">
+　DNSサービス事業者の米Dynが分散型サービス拒否（DDoS）攻撃を受けたことで発生した大規模なインターネット接続障害について、同社は現地時間2016年10月26日、事態の経緯と調査結果の概要を<a href="http://dyn.com/blog/dyn-analysis-summary-of-friday-october-21-attack/" target="_blank">公式ブログ記事</a>で明らかにした。それによると、今回の接続障害は、推定10万台のデバイスから受けたDDoS攻撃が原因で、デバイスの多くは、マルウエア「Mirai」に感染していた。
+</p>
+<div class="bpimage_right" style="width:310px;"><div class="bpimage_image"><img src="https://cdn-project.nikkeibp.co.jp/idg/atcl/idg/14/481542/102800290/ph.jpg?__scale=w:300,h:180&_sh=0bc0e30190" width="300" height="180" alt="Credit: Downdetector"></div>
+
+<div class="bpimage_caption">Credit: Downdetector</div></div>
+<p>
+　Miraiは、ネットワークカメラやデジタルビデオレコーダー（DVR）などを乗っ取る有名なマルウエアだ。「攻撃のトラフィックのかなりの部分が、Miraiを使ったボットネットから発信されていたことを立証できる」とブログ記事にはある。
+</p>
+<p>
+　この接続障害は現地時間10月21日に発生したもので、米国のさまざまな大手サイトがアクセスしにくくなった。この攻撃にMiraiが多少なりとも関係しているという見方は当初からあったが、今回のブログ記事で、Miraiに感染したデバイスが実際に主要な攻撃源だったことが明らかになった。
+</p>
+<p>
+　また、ブログ記事の内容を踏まえて考えると、犯人側は今回あえて攻撃を手加減していた可能性がある。各社の観測によると、Mirai系列のマルウエアに感染しているデバイスは50万台以上に及ぶ。デフォルトの脆弱なパスワードを使っていて、簡単に感染できるデバイスだ。
+</p>
+<div id="naviBottom">
+<p class="nextPagePreview">&gt;&gt;次ページ&#12288;<a href="/idg/atcl/idg/14/481542/102800290/?ST=idg-cm-network&P=2">21日の攻撃に関与したデバイスが10万台だけだったということは、...</a></p>
+<div id="pager">
+<p class="pages">
+<a href="/idg/atcl/idg/14/481542/102800290/?ST=idg-cm-network&P=1" class="now">1</a>
+<a href="/idg/atcl/idg/14/481542/102800290/?ST=idg-cm-network&P=2">2</a>
+<a href="/idg/atcl/idg/14/481542/102800290/?ST=idg-cm-network&P=3">3</a>
+<a href="/idg/atcl/idg/14/481542/102800290/?ST=idg-cm-network&P=2" class="tonext">&gt;&gt;</a>
+</p><!-- /.pages -->
+</div><!-- /#pager -->
+</div>
+<div id="relationLink" class="all"></div>
+</div><!--// kiji-->
+
+
+<p class="bottom_category_link">
+<a href="/idg/computerworld/network.html"><img src="/images/idg/computerworld/common/link_network.png" alt="Networkトップページへ" height="24"></a>
+</p>
+
+
+</div><!--// mainContent -->
+<div id="sideContent">
+<div id="rectangle">
+<div id="div-gpt-ad-rectangle1">
+<script type="text/javascript">
+googletag.cmd.push(function() {
+  googletag.display('div-gpt-ad-rectangle1');
+ });
+</script>
+</div></div><!--// rectangle -->
+
+<div class="mostread" id="mostread_cw">
+<h2><a href="/idg/computerworld/"><img src="/images/idg/computerworld/common/mostread_cw.png" alt="Computerworldで今読まれている記事" width="298" height="31"></a></h2>
+<ul>
+<li>
+<p class="rank"><img src="/images/idg/computerworld/common/rank1.png" alt="1" width="20" height="20"></p>
+<p class="title"><a href="/idg/atcl/19/00001/00330/">M2搭載Mac、年内に4機種が登場か</a></p>
+</li>
+<li>
+<p class="rank"><img src="/images/idg/computerworld/common/rank2.png" alt="2" width="20" height="20"></p>
+<p class="title"><a href="/idg/atcl/19/00001/00257/">iMacは外付けディスプレイとして使用可能、ただし要件に注意</a></p>
+</li>
+<li>
+<p class="rank"><img src="/images/idg/computerworld/common/rank3.png" alt="3" width="20" height="20"></p>
+<p class="title"><a href="/idg/atcl/19/00162/010800001/">IFTTTからの乗り換え先、有力候補5選（前）</a></p>
+</li>
+</ul>
+</div><!--// mostread_cw -->
+<div class="mostread" id="mostread_cio">
+<h2><a href="/idg/ciomagazine/"><img src="/images/idg/ciomagazine/common/mostread_cio.png" alt="CIOで今読まれている記事" width="298" height="31"></a></h2>
+<ul>
+<li>
+<p class="rank"><img src="/images/idg/ciomagazine/common/rank1.png" alt="1" width="20" height="20"></p>
+<p class="title"><a href="/idg/atcl/19/00128/091100001/">Outlookの迷惑機能「上位の結果」をオフにする方法</a></p>
+</li>
+<li>
+<p class="rank"><img src="/images/idg/ciomagazine/common/rank2.png" alt="2" width="20" height="20"></p>
+<p class="title"><a href="/idg/atcl/19/00002/00310/">新型13インチMacBook Pro、Touch Barが存続？</a></p>
+</li>
+<li>
+<p class="rank"><img src="/images/idg/ciomagazine/common/rank3.png" alt="3" width="20" height="20"></p>
+<p class="title"><a href="/idg/atcl/19/00002/00237/">Windows 11、ローカルアカウントでのセットアップはPro版のみ</a></p>
+</li>
+</ul>
+</div><!--// mostread_cio -->
+</div><!--// sideContent -->
+</div><!-- //Contentia -->
+
+<p class="pageup"><a href="#top"><img src="/images/idg/ciomagazine/common/pageup.png" alt="↑ページ先頭へ" width="104" height="21"></a></p>
+
+<div id="South">
+<div id="footer">
+<div id="fnav">
+<p>
+｜<a href="/idg/atcl/19/00001/00003/">Computerworldについて</a>｜<a href="https://support.nikkeibp.co.jp/app/answers/list/p/235">Computerworldへのお問い合わせ・ご意見</a>｜<a href="https://www.nikkeibp.co.jp/atcl/corporate/copyright/">著作権・リンクについて</a>｜<a href="https://www.nikkeibp.co.jp/atcl/corporate/privacy/">個人情報の取り扱い</a>｜
+</p>
+</div><!--//fnav-->
+
+<div id="fcredit">
+<p class="bplogo"><a href="https://www.nikkeibp.co.jp/" target="_blank"><img src="/images/bplogo/logo.svg" alt="日経BP社" width="120" height="auto"></a></p>
+<p class="idglogo"><a href="http://www.idg.com/" target="_blank"><img src="/images/idg/computerworld/common/idglogo.png" alt="IDG" width="122" height="30"></a></p>
+<div class="copyright">
+<p>Copyright &copy; Nikkei Business Publications, Inc. and International Data Group, Inc. All rights reserved.</p>
+<p>このページに掲載されている記事・写真・図表などの無断転載を禁じます。著作権は日経BP社およびIDG、またはその情報提供者に帰属します。掲載している情報は、記事執筆時点のものです。</p>
+</div>
+</div><!--//fcredit-->
+</div><!--//footer-->
+</div><!--// South -->
+<!-- Start TagManager（Common） -->
+<script src="/js/bpcommon/onetag/bpTrackVarsCommon.js">
+  
+{
+"aggregateId":"project-idg-cm-network-all",
+"articleId": "00009K5q",
+"articlePageTotalNo": "3",
+"authKind": "FREE",
+"authKindRaw": "FREE",
+"authorName": "",
+"authResult": "true",
+"category": "idg",
+"displayAuthorName": "Michael Kan IDG News Service",
+"checkedBy": "",
+"editor": "-----",
+"pageStatus": "bparticle",
+"pageTitle": "DNSサービス「Dyn」への大規模DDoS攻撃、発信源は10万台のIoT機器",
+"parentThemeName": "Computerworld：トップ",
+"parentTitle": "Computerworldニュース",
+"publishDate": "20161028",
+"publishDateTime": "2016-10-28 10:35:00",
+"mediaId": "COMWORLD",
+"section": "0",
+"subSite": "idg",
+"categorizedThemeId": "idg-cm-software;idg-cm-industries",
+"themeId": "idg-cm-network",
+"themeName": "Computerworld：Network",
+"tieupId": "",
+"repTieupId": "",
+
+}
+</script>
+<!-- End TagManager（Common） --><!-- Start TagManager（Origin） -->
+<!-- Start javascript_global_object -->
+<script src="/js/bpcommon/onetag/bpTrackVars.js">
+{
+"channel":"PRJ",
+"config.adobe.reportSuite": "nbpprjprod",
+"config.atlas.service": "enable",
+"config.cx.siteId": "1135167558735557703",
+"config.fb.id": "151720335485995",
+"config.krux.siteId": "sx62zr52h",
+"tagName": "idg-cm-software;idg-cm-industries",
+}
+</script>
+<!-- End javascript_global_object --><!-- End TagManager（Origin） -->
+<!-- Start TagManager（Common2） -->
+<script type="text/javascript">_satellite.pageBottom();</script>
+<noscript>
+<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PXP529Z" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+</noscript>
+<!-- End TagManager（Common2） --><script type="text/javascript">
+(function() {
+var pa = document.createElement('script'); pa.type = 'text/javascript'; pa.charset = "utf-8"; pa.async = true;
+pa.src = window.location.protocol + "//api.popin.cc/searchbox/itpro.js";
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(pa, s);
+})();
+</script>
+</body>
+</html>
