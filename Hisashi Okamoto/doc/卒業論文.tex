@@ -1,0 +1,599 @@
+\documentclass{thesis}
+
+% TX Fonts を使う
+\usepackage{txfonts}
+
+\begin{document}
+
+% 目次
+\tableofcontents
+
+\chapter{まえがき}
+\section{研究背景および目標・目的}
+近年、IoT技術を含む情報通信技術の発展に伴い、高性能・多機能化によりICの構造は複雑になっている。ICのテストや評価を容易に行うためにはテスト・デバックインフラであるJTAGが必要である。\par
+しかしながら、ICのハードウェアセキュリティ問題にJTAGが原因となるものがある。このセキュリティ問題には、外部から権限のないユーザがターゲットICのJTAG機構に対してリバースエンジニアリングを行い、JTAG機構へのアクセス権限を取得したうえ、JTAG機能のデバック機能を悪用することでターゲットICに対して攻撃を仕掛けるという脆弱性がある。このような攻撃を防ぐ方法として、JTAGポートに認証機構を用いることで正しく認証されたユーザのみに対してアクセスを許可するという方法が挙げられている。認証機構には共通鍵暗号方式を用いた認証方式や、チャレンジレスポンス認証に基づいた認証方式が提案されている。\cite{JTAGセキュリティ}\par
+一方で、IoTデバイスは低スペックのマイコンやセンサ、低消費電力の通信モジュールがほとんどであり、一般的に非常に低いコストで製造されているため、複雑な暗号回路を含む認証機構などのコストのかかるセキュリティハードウェアを設けることは困難である。\par
+IoTにおいて、セキュリティによる保護のないデバイスがインターネットに接続されてしまうと、IoTシステム全体の安全性を損なうことになる。\par
+そこで、本研究ではIoTデバイスにおいて極めて小さい処理負荷で暗号鍵の配送が実現できるワンタイムパスワード認証方式であるSAS-L2を用いて、JTAGの認証機構の軽量化手法を提案する。目標としては、SAS-L2をハードウェア化したSAS認証回路を設計し、FPGAに実装する。
+\section{論文の構成}
+本論文の構成は以下の通りである。第2章ではJTAGのセキュリティ脆弱性についての説明を述べる。第3章ではFPGAの説明を述べる。第4章ではSAS-L2の説明を述べる。第5章ではSAS-L2認証を用いたJTAG認証プロトコルの説明を述べる。第6章ではSAS認証回路の設計の概要を示す。第7章ではSAS認証回路のFPGAへ実装の概要について示す。第8章では実装したSAS認証回路についての考察を示す。第9章では本研究のまとめを行う。
+
+\chapter{JTAGのセキュリティ脆弱性}
+　本章ではJTAGとJTAGアクセスポートのセキュリティ脆弱性についての説明を述べていく。
+\section{JTAGの構造}
+JTAGとは4本または5本の外部端子のみでIC内の回路にアクセスするためのシリアルアクセスポートの標準規格であり、ICのテスト・評価を行うためやFPGAに回路情報を書き込むために利用されている。\cite{JTAGセキュリティ}\par
+図\ref{JTAG}にJTAG対応デバイスの例を示す。
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.5]{./JTAGinIC.eps}
+ \caption{JTAG対応デバイスの例}
+ \label{JTAG}
+\end{figure}
+図\ref{JTAG}を用いてJTAGの構造について述べていく。\par
+まず、JTAGのインタフェース信号にはTCK、TDI、TDO、TMSのJTAGにおいて必須な4本の信号とTRSTというオプションの信号が存在し、これらをまとめてTAP(Test Access Port)と呼ぶ。TCKはクロック、TDIはデータ入力、TDOはデータ出力、TMSはTAPコントローラの状態遷移に用いられる。\par
+次に、JTAGのレジスタにはインストラクションレジスタとデータレジスタの2種類が存在する。\par
+インストラクションレジスタでは、現在の命令を保持しており、TAPコントローラは保持されている命令を用いて受信した信号の処理を決定する。\par
+データレジスタではバウンダリスキャンレジスタ(BSR)がデバイスのI/Oピンとの間に配置され、これらをチェーン状に接続してシフトレジスタを構成する。このシフトレジスタを利用してデータの読み書きを行っている。BSRのほかに必須となるBypassレジスタやデバイスの部品番号や部品のバージョンコードなどを格納しているIDレジスタの3つが存在している。\par
+最後に、TAPコントローラではTMS信号によって状態遷移を制御しているステートマシンであり、JTAGの動作を制御している。\cite{JTAG構造}
+
+\section{JTAGアクセスポートの脆弱性と対策}
+JTAGへの不正アクセスを防ぐためにJTAGインフラストラクチャーにロッキング回路を追加することでTAPコントローラーを制御するアクセス認証機構が提案されている。\par
+この認証機構では通常はTAPをロッキング回路によってロックしている状態である。そして、クライアントはJTAGポートをアクセスする際にパスワードの入力が求められ、デバイスに格納されている認証データと照合し、一致した場合にTAPを解除し、全てのJTAGインフラストラクチャーへのアクセスを許可する。\par
+また、盗聴などによるパスワードの漏洩を防ぐために共通鍵暗号や公開鍵暗号などの暗号回路を導入した認証機構も提案されている。\par
+一方で、IoTシステムにおいて、従来のJTAG認証方法が以下の課題に直面している。\par
+まず、ハードウェアコスト面に課題が存在する。デバイス側にJTAGアクセス認証を実現するには暗号回路を含む専用のハードウェアリソースを追加する必要がある。IoTシステムにおいては低コストで生産されていることから低スペックである製品がほとんどであり、コストのかかる認証専用のハードウェアを実装することは困難である。\par
+そして、セキュリティ面にも課題が存在する。IoTシステムではデバイスが現場に設置され、デバイス間で頻繁なデータのやり取りが行われる。そのため盗聴により大量のデータを容易に得ることが可能であるため、総当たり攻撃が容易に行われる。従来法では認証データはデバイス側に格納し、固定されている。そのため暗号化された認証データが盗聴された場合、総当たり攻撃により認証データが割り出されてしまうリスクがある。\cite{JTAG認証機構}
+
+\chapter{FPGA}
+　本章では本研究で使用するデバイスであるFPGAの説明を述べていく。\par
+FPGAはField Programmable Gate Arrayの略で、現場でプログラム可能な論理回路の多数配列という意味であり、ハードウェア言語(VHDL、Verilog HDLなど)を用いることで内部の回路を書き換えることが可能なデバイスである。\par
+FPGAはロジックセル(LC)と呼ばれる回路ブロックを格子状に並べ、それぞれのブロックをハードウェア言語によるプログラムで配線することで回路を実現している。\par
+以下の図\ref{FPGAstr}にFPGAの構造を示す。
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.7]{./FPGAstr.eps}
+ \caption{FPGAの構造}
+ \label{FPGAstr}
+\end{figure}
+
+図\ref{FPGAstr}が示すようにFPGAはLC、I/O、SB、CBから構成されている。\par
+まず、LCはロジックセルを示している。ロジックセルでは入力に対して出力を割り当てるテーブルを小規模なRAMに書き込んでおくことで論理回路を実現しており、このRAMのことをLUT(Look Up Table)と呼ぶ。\par
+次に、I/Oは外部からの入出力を示しており、CBはコネクションブロックと呼び、多数のロジックセルやI/Oを接続するための配線を行っている。
+そして、SBはスイッチブロックと呼び、信号をどこに送るかを切り替えており、CBだけでは実現できない柔軟性を補っている。\cite{FPGAstr}\par
+また、FPGAはRAMによって構成されているため、電源を切ると書き込まれている回路情報は消えてしまう。このため、FPGAを使用する際は外部に不揮発性メモリを用意し、電源投入時にこのメモリから回路情報を読み込んで動作を始める。\par
+最後に、FPGAにはその場で回路情報を書き換え、回路をダウンロードさせてすぐに動作させることが可能であるという特徴があるため、FPGAを用いて開発を行う際にエラーが判明した場合でもその場で修正可能であるというメリットがある。\cite{FPGA}\par
+
+\chapter{SAS-L2}
+　本章では、本研究で使用するワンタイムパスワード認証方式であるSAS-L2の説明を述べていく。
+\section{ワンタイムパスワード認証方式}
+ワンタイムパスワード認証方式とは、認証の際に利用されるパスワードの盗聴を防ぐために、認証を行うごとにパスワードを使い捨てる認証方式である。この認証方式は認証(サーバ)側が被認証(クライアント)側の資格認証に用いられるだけでなく、認証ごとに変化する認証情報を元に暗号鍵を生成し、サーバ側とクライアント側で共有することで暗号通信を実現することにも用いることが可能である。%\cite{SAS-L2}
+
+\section{SAS-L2の概要}
+SAS-L2はSimple And Secure password authentication protocol Light processing type 2の略で、高知工科大学の清水明宏教授が提案したワンタイムパスワード認証方式である。この認証方式の特徴はクライアント側での演算は排他的論理和2回と加算2回(更新を除くと1回)のみで認証処理が実行できる点である。%\cite{SAS-L2}
+　
+\section{SAS-L2初期登録処理}
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.7]{./SAS-L2syoki.eps}
+ \caption{SAS-L2初期登録処理}
+ \label{sasl2syoki}
+\end{figure}
+図\ref{sasl2syoki}はSAS-L2の初期登録手順についてのフローチャートを示しており、初期登録処理は以下のような処理を行う。
+\begin{enumerate}[(i)]
+\item サーバ側で乱数を用いて初回秘匿情報$M_1$と、ユーザ識別子$S$(IDとパスワード)を生成し保存を行い、乱数$N_1$と一方向性関数$H$(ハッシュ関数など)を用いて暗号化し、初回認証情報$A_1$を生成する。
+\item サーバ側で生成された初回秘匿情報$M_1$と初回認証情報$A_1$を安全な手段でクライアント側と共有する。
+\end{enumerate}
+\section{SAS-L2認証処理}
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.7]{./SAS-L2ninnsyou.eps}
+ \caption{SAS-L2認証処理}
+ \label{sasl2ninnsyou}
+\end{figure}
+図\ref{sasl2ninnsyou}認証手順を示したものであり、認証処理では以下のような処理を行う。
+\begin{enumerate}[(i)]
+\item サーバ側で新たに乱数$N_{n+1}$を生成し、これと一方向性関数$H$を用いて保存していたユーザ識別子$S$を暗号化し次回認証情報$A_{n+1}$を生成する。
+\item サーバ側で以下の演算を行い送信データ$\alpha$を生成し、クライアント側へ送信する。
+\begin{equation}\label{eqn:alphagen}
+	\alpha = A_{n+1} \oplus A_n \oplus M_n
+\end{equation}
+\item クライアント側では受信した$\alpha$を保存していた認証情報と秘匿情報である$A_n$と$M_n$と以下のように排他的論理和を取ることで、サーバ側で生成された$A_{n+1}$を復号し、一時的に保存する。
+\begin{equation}\label{eqn:an1}
+	A_{n+1} = \alpha \oplus A_n \oplus M_n
+\end{equation}
+\item クライアント側で以下の演算を行い送信データ$\beta$を生成し、サーバ側へ送信する。
+\begin{equation}\label{eqn:aupd}
+	\beta = A_{n+1} + A_n
+\end{equation}
+\item サーバ側でも$A_{n+1} + A_n$の演算を行い、演算結果が受信した$\beta$と等しい場合は認証成功となる。
+\item 認証成功の場合はクライアント側に認証成功を送信し、サーバ側とクライアント側の秘匿情報$M_n$を以下の演算で更新し、認証情報$A_n$を$A_{n+1}$に更新する。
+\begin{equation}\label{eqn:mn1gen}
+	M_{n+1} = A_n + M_n
+\end{equation}
+\begin{equation}\label{eqn:mupd}
+	M_n = M_{n+1}
+\end{equation}
+\item 認証失敗の場合はクライアント側に認証失敗を送信し、秘匿情報と認証情報の更新を行わない。
+\end{enumerate}
+
+\chapter{SAS-L2を用いたJTAG認証プロトコル}
+　本章ではSAS-L2を用いたJTAG認証プロトコルについての説明を述べていく。\par
+JTAGにおけるSAS-L2認証方式の実現には、IC製品の出荷前にメーカーによるデバイスとユーザの識別情報（デバイスIDとパスワードなど）を暗号化し、初期認証情報としてデバイスのメモリに書き込むことが必要である。また、IC製品ごとのデバイス識別情報とユーザ情報を管理するために、メーカー側はデバイス管理サーバ（DMS）を用意することが必要である。\par
+図\ref{JTAGpro}にSAS-L2によるJTAGアクセス認証のイメージを示す。
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.7]{./JTAGpro.eps}
+ \caption{SAS-L2によるJTAG認証プロトコル}
+ \label{JTAGpro}
+\end{figure}
+
+IC製品の出荷後、クライアントはオンチップデバッグ(OCD)ツールを用いて、以下の手順でデバイスに組込まれるJTAGにアクセスする。
+\begin{enumerate}[(i)]
+\item クライアントがOCDツールで製品メーカーのデバイス管理サーバにアクセスする。アクセスする際に別途の認証が求められる。
+\item クライアントがDMSにおいてターゲットデバイスへのアクセス要請を送信する。
+\item DMSがクライアントからのアクセス要請を受理し、当該デバイスの識別情報に対して、認証データ$A_{n+1}$を新規に生成し、認証コード$\alpha$を作成してクライアントに送信する。
+\item クライアントがDMSから受信した認証コード$\alpha$をOCDツールを用いてJTAGに送信する。
+\item JTAGデバイス側では、クライアントが入力した認証コード$\alpha$に対して、セキュアメモリに格納されている前回認証データ$A_n$と排他的論理和を取ることで、DMS側で生成した新規認証データ$A_{n+1}$を解く。
+\item JTAGデバイスで、$A_n$と$A_{n+1}$および$\alpha$を用いて、認証データ$\beta$を生成し、クライアントに送信する。
+\item クライアントが$\beta$をDMSにアップロードして、認証データの照合処理を行う。
+\item 認証成立の場合は$A_n+A_{n+1}$を、認証失敗の場合は乱数を認証結果としてクライアントに発行する。
+\item クライアントがDMSから受信した認証結果をJTAGに送信する。
+\item JTAGデバイスにおいて、認証結果を$A_{n}+A_{n+1}$と比較し、一致した場合はメモリのデータを$A_{n+1}$に更新し、アクセス権限を開放する。一致しない場合は更新せず、TAPをロックしたままにする。
+\end{enumerate}
+　(viii)～(x)において、データ改ざんによるDMSとJTAG機器間の認証情報の不整合が起きる恐れがあるため、DMSとクライアントおよびJTAGデバイスの間で安全な通信ルートを確保することが必要である。\par
+以上のプロトコルはJTAG対応機器に強力なセキュリティ対策をより低コストで実装することが可能であると考えられている。その理由を以下に述べる。\par
+まず、コスト面について述べていく。デバイス側では排他的論理和と加算などといった簡単な演算回路のみが必要となるため、認証用ハードウェアが少ない。また、乱数や一方向性関数といったワンタイムパスワード認証で必要とされる演算はDMSに集中するので少ないソフトウェアで大量のデバイスに対して認証の実行が可能である。\par
+次に、セキュリティ面について述べていく。暗号化された認証情報は認証が行われるごとに更新されるため、総当たり攻撃に強く、データのやり取りが頻繁に行われるIoTシステムに適している。また、ワンタイムパスワード認証に必要な認証情報の生成はDMSで行われているため、必要に応じて生成アルゴリズムの強化が可能であり、セキュリティが強いと言える。\cite{JTAG認証機構}
+
+\chapter{SAS認証回路の設計}
+　本章ではSAS認証回路の設計について述べる。
+
+\section{SAS認証回路の設計手順}
+今回FPGAに実装するSAS認証回路はSAS-L2認証処理のクライアント側をハードウェア化したものであり、その設計方法を以下に示す。
+%箇条書き
+\begin{enumerate}[(1)]
+\item ハードウェア全体の入力と出力を示した構成図を作成する。
+\item ハードウェアを制御するための状態を把握するために状態遷移図を作成する。
+\item 必要なモジュールの設計図を作成する。
+\item モジュール間の接続を示した図を作成する。
+\end{enumerate}
+
+以上の順に設計を進めていく。
+
+\newpage
+
+\section{SAS認証回路の概要}
+はじめにSAS-L2のクライアント側の認証処理からSAS認証回路全体の構成図を以下の図\ref{sasl2block}に示す。
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.6]{./SAS-L2block.eps}
+ \caption{ハードウェアのイメージ図}
+ \label{sasl2block}
+\end{figure}
+
+図\ref{sasl2block}が示すように今回実装するハードウェアは認証要請を受け取り、サーバで算出した$\alpha$を受信し、サーバで認証を行うために必要な$\beta$を生成したのちサーバに送信する。このとき、クライアント側の状態をサーバへ送信することで、$\alpha$の受信と$\beta$の送信のタイミングを合わせる。\par
+そして、サーバから認証の成否を受信し、認証成功であれば認証情報$A_n$と秘匿情報$M_n$をサーバと合致させるための更新作業を行い、認証失敗であればそのまま次の認証要請を受信するまで待機するように設計する。\par
+また、今回サーバとクライアントでやり取りするデータである$\alpha$と$\beta$は一般的に最適な暗号鍵のサイズといわれている256bitに設定する。
+
+\newpage
+
+\section{状態遷移}
+次にSAS-L2のクライアント側の認証処理を実装するために必要なハードウェアの状態について整理し、以下の表\ref{ハードウェアの状態}に示す。表\ref{ハードウェアの状態}中のQ2～Q0は状態制御信号を表している。
+\begin{table}[htb]
+　\begin{center}
+\caption{SAS認証回路の状態}
+\label{ハードウェアの状態}
+  \begin{tabular}{|p{1cm}|p{1cm}|p{1cm}|p{3cm}|} \hline
+  Q2 & Q1 & Q0 & 状態 \\ \hline \hline
+   0  &  0  &  0  & S0 : 待機 \\ \hline
+   0  &  0  &  1  & S1 : $\alpha$受信 \\ \hline
+   0  &  1  &  0  & S2 : $A_{n+1}$生成1 \\ \hline
+   0  &  1  &  1  & S3 : $A_{n+1}$生成2 \\ \hline
+   1  &  0  &  0  & S4 : $\beta$生成 \\ \hline
+   1  &  0  &  1  & S5 : $\beta$送信 \\ \hline
+   1  &  1  &  0  & S6 : $M_n$更新 \\ \hline
+   1  &  1  &  1  & S7 : $A_n$更新 \\ \hline
+  \end{tabular}
+  \end{center}
+\end{table}　\\
+状態S2、状態S3、状態S4、状態S6および状態S7は以下のような演算を行っている。
+\begin{equation}\label{eqn:S2}
+	S2 : N = \alpha \oplus A_n
+\end{equation}
+\begin{equation}\label{eqn:S3}
+	S3 : A_{n+1} = N \oplus M_n
+\end{equation}
+\begin{equation}\label{eqn:S4}
+	S4 : \beta = A_{n+1} + A_n
+\end{equation}
+\begin{equation}\label{eqn:S6}
+	S6 : M_n = A_n + M_n
+\end{equation}
+\begin{equation}\label{eqn:S7}
+	S7 : A_n = A_{n+1}
+\end{equation}
+次に図\ref{状態遷移図}に状態遷移を示した状態遷移図を示す。
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.7]{./joutaiseni.eps}
+ \caption{状態遷移図}
+ \label{状態遷移図}
+\end{figure}
+ハードウェアの状態は待機(S0)と認証(S1～S5)、更新(S6、S7)の3つに分けられる。待機から認証へ遷移する条件は、認証要請$call$が$call = 1$となるときであり、$\beta$の送信が終わると認証から待機に遷移する。待機から更新へ遷移する条件は、サーバから認証成功を表す$suc=1$を受信したときであり、$M_n$の更新、$A_n$の更新の順番で更新を行ったのちに待機へ遷移する。\par
+認証では、まず$call = 1$を受信するとS1に遷移し、サーバから$\alpha$を受信し、受信が終わるとS2に遷移する。次にS2～S4では受信した$\alpha$を$A_n$と$M_n$を用いて排他的論理和と加算を用いることで$\beta$を生成する。このときの状態遷移条件は演算の終了である。最後にS5では生成した$\beta$をサーバへ送信し、送信が終わるとS0へ遷移して認証結果を待つ。\par
+更新では、サーバから認証成功を表す$suc=1$を受信したときにS6へ遷移し、S6では$M_n$を更新、S7では$A_n$を更新する。このとき、式\ref{eqn:S6}からわかるように$M_n$の更新には更新前の$A_n$が必要となるので、必ず$M_n$を更新してから$A_n$を更新しなければならない。また、遷移条件は、S2～S4での遷移条件と同様である。
+
+\newpage
+
+\section{SAS認証回路に必要なモジュールの設計}
+今回実装するSAS認証回路に必要なモジュールを述べていく。\par
+\subsection{データ転送モジュール}
+まず、データの転送を行うモジュールが必要であり、今回は256bitのデータのやり取りを行う。サーバで$\alpha$を生成する際に、unsigned int型で大きさが8の配列で設定する。そのため、クライアント側では32bitずつ受信し、256bitに変換して演算器に送信するためのモジュールが必要となる。そして、$\beta$も$\alpha$と同様にサーバではunsigned int型で大きさ8の配列で扱うため、演算器から256bitの結果を32bitずつに分割してサーバへ送信するためのモジュールが必要である。\par
+以上を踏まえて、設計したデータ受信モジュールを図\ref{data_in}と表\ref{data_inIO}に、データ送信モジュールを図\ref{data_out}と表\ref{data_outIO}に示す。
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=1.0]{./data_in32.eps}
+ \caption{データ受信モジュール}
+ \label{data_in}
+\end{figure}
+
+\begin{table}[htb]
+　\begin{center}
+\caption{データ受信モジュールの入出力}
+\label{data_inIO}
+  \begin{tabular}{|p{2cm}|p{1cm}|p{4cm}|} \hline
+  信号名 & I/O & 備考 \\ \hline \hline
+   CLK   &  in   & システムクロック  \\ \hline
+   rst   &  in   &  リセット信号  \\ \hline
+   DI0  &  in   &  受信データ$\alpha$(32bit)  \\ \hline
+   DI1  &  in   &  受信データ$\alpha$(32bit)  \\ \hline
+   DI2  &  in   &  受信データ$\alpha$(32bit)  \\ \hline
+   DI3  &  in   &  受信データ$\alpha$(32bit)  \\ \hline
+   DI4  &  in   &  受信データ$\alpha$(32bit)  \\ \hline
+   DI5  &  in   &  受信データ$\alpha$(32bit)  \\ \hline
+   DI6  &  in   &  受信データ$\alpha$(32bit)  \\ \hline
+   DI7  &  in   &  受信データ$\alpha$(32bit)  \\ \hline
+   st      &  in    &  状態制御信号  \\ \hline
+   PDO   &  out  &  受信データ$\alpha$(256bit)  \\ \hline
+  \end{tabular}
+  \end{center}
+\end{table}　\\
+
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=1.0]{./data_out32.eps}
+ \caption{データ送信モジュール}
+ \label{data_out}
+\end{figure}
+
+\begin{table}[htb]
+　\begin{center}
+\caption{データ送信モジュールの入出力}
+\label{data_outIO}
+  \begin{tabular}{|p{2cm}|p{1cm}|p{4cm}|} \hline
+  信号名 & I/O & 備考 \\ \hline \hline
+   CLK   &  in   & システムクロック  \\ \hline
+   rst   &  in   &  外部からのリセット信号  \\ \hline
+   RES   &  in   &  送信データ$\beta$(256bit)  \\ \hline
+   st      &  in    &  状態制御信号  \\ \hline
+   DO0   &  out  &  送信データ$\beta$(32bit)  \\ \hline
+   DO1   &  out  &  送信データ$\beta$(32bit)  \\ \hline
+   DO2   &  out  &  送信データ$\beta$(32bit)  \\ \hline
+   DO3  &  out  &  送信データ$\beta$(32bit)  \\ \hline
+   DO4   &  out  &  送信データ$\beta$(32bit)  \\ \hline
+   DO5   &  out  &  送信データ$\beta$(32bit)  \\ \hline
+   DO6   &  out  &  送信データ$\beta$(32bit)  \\ \hline
+   DO7   &  out  &  送信データ$\beta$(32bit)  \\ \hline
+  \end{tabular}
+  \end{center}
+\end{table}　\\
+
+\subsection{ステートマシン}
+次に必要なモジュールはSAS認証回路の状態遷移を実現するためのステートマシンが必要である。今回は、S0からS1への状態遷移とS0からS6へ遷移するとき以外は演算が終わると状態遷移を行うため、ステートマシンで演算も行えるように設計する。\par
+さらに、S2～S4ではメモリからデータを読み出し、S6とS7では演算結果をメモリに書き込まなければいけないので、メモリの読み出しモードと書き込みモードを変更させなければいけない。よって、ハードウェアの状態によってメモリのモード変更の制御が行えるように設計する。\par
+また、今回はリセット信号を外部から直接各モジュールへ送信するのではなくこのステートマシンを通してから各モジュールへ送信するように設計する。\par
+これらを踏まえて設計したステートマシンを図\ref{ALU}と表\ref{ALUIO}に示す。
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=1.0]{./ALU.eps}
+ \caption{ステートマシン}
+ \label{ALU}
+\end{figure}
+
+\begin{table}[htb]
+　\begin{center}
+\caption{ステートマシンの入出力}
+\label{ALUIO}
+  \begin{tabular}{|p{2cm}|p{1cm}|p{10cm}|} \hline
+  信号名 & I/O & 備考 \\ \hline \hline
+   CLK   &  in   & システムクロック  \\ \hline
+   RST   &  in   &  RST = 1 : リセット  \\ \hline
+   call   &  in   & 認証要請  \\ \hline
+   suc   &  in   & 認証の成否  \\ \hline
+   PD  &  in    &  受信データ($\alpha$)  \\ \hline
+   MD  &  in    &  メモリからの入力(256bit)  \\ \hline
+   st   &  out  &  状態制御信号(3bit)  \\ \hline
+   rst   &  out   &  リセット信号  \\ \hline
+   rdwr   &  out   &  メモリの読み書き有効化信号(read : 0、write : 1)  \\ \hline
+   RES   &  out  &  演算結果(256bit)  \\ \hline
+  \end{tabular}
+  \end{center}
+\end{table}　\\
+
+ステートマシン内部で行われている演算の変化について状態と演算の対応を以下の表\ref{ALU演算}に示す。
+
+\begin{table}[htb]
+　\begin{center}
+\caption{ハードウェアの状態とステートマシン内部の演算の対応}
+\label{ALU演算}
+  \begin{tabular}{|p{4cm}|p{5cm}|} \hline
+  ハードウェアの状態 & 演算内容  \\ \hline \hline
+   010(S2)   &  $N = \alpha \oplus A_n$   \\ \hline
+   011(S3)   &  $A_{n+1} = N \oplus M_n$  \\ \hline
+   100(S4)   &  $\beta = A_{n+1} + A_n$    \\ \hline
+   110(S6)   &  $M_n = A_n + M_n$    \\ \hline
+   111(S7)   &  $A_n = A_{n+1}$    \\ \hline
+  \end{tabular}
+  \end{center}
+\end{table}　\\
+
+\subsection{メモリ・アドレスレジスタ}
+最後に必要になるモジュールは演算で利用する認証情報$A_n$と秘匿情報$M_n$を格納しておくためのメモリ、そしてメモリのデータにアクセスするために必要なアドレスを格納しておくためのアドレスレジスタである。設計したメモリを図\ref{RAM}と表\ref{RAMIO}に、アドレスレジスタを図\ref{アドレスレジスタ}と表\ref{アドレスレジスタIO}に示す。
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=1.0]{./ram.eps}
+ \caption{メモリ}
+ \label{RAM}
+\end{figure}
+
+\begin{table}[htb]
+　\begin{center}
+\caption{メモリの入出力}
+\label{RAMIO}
+  \begin{tabular}{|p{2cm}|p{1cm}|p{5cm}|} \hline
+  信号名 & I/O & 備考 \\ \hline \hline
+   CLK   &  in   & システムクロック  \\ \hline
+   wren  &  in   &  書き込み有効化信号  \\ \hline
+   address   &  in   & アドレス($A_n : 0$、$M_n : 1$)  \\ \hline
+   rden  &  in    &  読み出し有効化信号  \\ \hline
+   RES   &  in  &  更新データ(256bit)  \\ \hline
+   MD   &  out  &  演算器への出力(256bit)  \\ \hline
+  \end{tabular}
+  \end{center}
+\end{table}　\\
+
+\newpage
+
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.8]{./adr_reg.eps}
+ \caption{アドレスレジスタ}
+ \label{アドレスレジスタ}
+\end{figure}
+
+\begin{table}[htb]
+　\begin{center}
+\caption{アドレスレジスタの入出力}
+\label{アドレスレジスタIO}
+  \begin{tabular}{|p{2cm}|p{1cm}|p{5cm}|} \hline
+  信号名 & I/O & 備考 \\ \hline \hline
+   st  &  in    &  状態制御信号(3bit)  \\ \hline
+   adr   &  out  &  アドレス($A_n : 0$、$M_n : 1$)  \\ \hline
+  \end{tabular}
+  \end{center}
+\end{table}　\\
+
+アドレスレジスタは状態制御信号を受け取り、それに対応したアドレスを出力する。以下の表\ref{アドレス出力}に状態制御信号とアドレスの対応を示す。
+
+\begin{table}[htb]
+　\begin{center}
+\caption{ハードウェアの状態とアドレスの対応}
+\label{アドレス出力}
+  \begin{tabular}{|p{3cm}|p{4cm}|} \hline
+   状態制御信号 & 出力するアドレス  \\ \hline \hline
+   000(S0)   &  1   \\ \hline
+   001(S1)   &  0   \\ \hline
+   010(S2)   &  0   \\ \hline
+   011(S3)   &  0   \\ \hline
+   100(S4)   &  1   \\ \hline
+   101(S5)   &  0   \\ \hline
+   110(S6)   &  0   \\ \hline
+   111(S7)   &  0   \\ \hline
+  \end{tabular}
+  \end{center}
+\end{table}　\\
+
+\section{モジュール間の接続}
+各モジュールを実装するために接続し、完成させたSAS認証回路のモジュール図を図\ref{モジュール図}に示す。
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.7]{./kairokousei.eps}
+ \caption{SAS認証回路のモジュール図}
+ \label{モジュール図}
+\end{figure}
+
+\chapter{実装}
+
+本章では本研究で実装した対象と実装後の結果を示す。
+\section{検証方法・実装対象}
+今回設計したSAS認証回路が正しく動作するかを検証するにあたってFPGAへの実装を行う前に、コンピュータ上でのシミュレーションを実施し、モジュールごとで正しく動作しているかの検証と、回路全体で正しく動作しているかを検証する。
+\begin{table}[htb]
+　\begin{center}
+\caption{シミュレーション環境}
+\label{シミュレーション環境}
+  \begin{tabular}{|p{5cm}|p{5cm}|} \hline
+  使用OS                & シミュレーション環境  \\ \hline \hline
+ Windows 10  &  Modelsim  \\ \hline
+  \end{tabular}
+  \end{center}
+\end{table}　\\
+
+そして、シミュレーションでSAS認証回路の動作に問題がないことを確認した後に、設計したSAS認証回路をFPGAのMAX10に実装し、この回路を動作させるために簡易的なサーバの処理を今回使用するFPGAであるMAX10で利用可能なエンデベッド・プロセッサであるNIOS IIに実装する。
+\begin{table}[htb]
+　\begin{center}
+\caption{実装環境}
+\label{実装環境}
+  \begin{tabular}{|p{5cm}|p{5cm}|p{3cm}|} \hline
+  実装内容                & 実装環境 & 開発言語  \\ \hline \hline
+ クライアント側の処理  &  MAX10  & verilog HDL \\ \hline
+ サーバ側の処理       &  MAX10 (NIOS II)  &  C言語 \\ \hline
+  \end{tabular}
+  \end{center}
+\end{table}　\\
+
+\section{シミュレーション結果}
+シミュレーションを実行する際に、モジュールごとにシミュレーションを行った後に回路全体のシミュレーションを行った。\par
+はじめに、データ受信モジュールについてシミュレーションを行った結果を以下の図\ref{データ受信_sim}に示す。
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.4]{./data_in32_wave.eps}
+ \caption{データ受信モジュール波形図}
+ \label{データ受信_sim}
+\end{figure}
+この図\ref{データ受信_sim}のシミュレーション結果から各DIから32bitの入力を受け取り、状態がS1に遷移すると256bitで受け取った入力を出力していることが確認できたので、データ受信モジュールが正しく動作していると言える。\par
+次に、データ送信モジュールについてシミュレーションを行った結果を以下の図\ref{データ送信_sim}に示す。
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.4]{./data_out32_wave.eps}
+ \caption{データ送信モジュール波形図}
+ \label{データ送信_sim}
+\end{figure}
+図\ref{データ送信_sim}のシミュレーション結果から256bitの入力を受け取り、状態がS5に遷移すると各DOから32bitの出力がされていることが確認できたので、データ送信モジュールが正しく動作していると言える。\par
+次に、ステートマシンについてシミュレーションを行った結果を以下の図\ref{ALU_sim1}、図\ref{ALU_sim2}に示す。
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.4]{./ALU_wave1.eps}
+ \caption{ステートマシン波形図1}
+ \label{ALU_sim1}
+\end{figure}
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.4]{./ALU_wave2.eps}
+ \caption{ステートマシン波形図2}
+ \label{ALU_sim2}
+\end{figure}
+図\ref{ALU_sim1}から状態遷移が設計した通り、$call = 1$のタイミングでS0$\rightarrow$S1と遷移しており、その後もS1$\rightarrow$S2$\rightarrow$S3$\rightarrow$S4$\rightarrow$S5と遷移していることが確認できる。そして、$suc = 1$のタイミングでS0$\rightarrow$S6遷移し、その後S6$\rightarrow$S7$\rightarrow$S0と遷移していることが確認できる。\par
+図\ref{ALU_sim2}のシミュレーション結果から正しい演算が行われていることが確認できる。
+以上2つのシミュレーション結果からステートマシンが正しく動作していると言える。\par
+次に、メモリについてシミュレーションを行った結果を以下の図\ref{RAM_sim}に示す。
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.5]{./ram_wave.eps}
+ \caption{メモリ波形図}
+ \label{RAM_sim}
+\end{figure}
+図\ref{RAM_sim}のシミュレーション結果からアドレスによって読み出す値が変化していることと、書き込みが行われていることが確認できたので、メモリが正しく動作していると言える。\par
+次に、アドレスレジスタについてシミュレーションを行った結果を以下の図\ref{アドレスレジスタ_sim}に示す。
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.5]{./adr_reg_wave.eps}
+ \caption{アドレスレジスタ波形図全体}
+ \label{アドレスレジスタ_sim}
+\end{figure}
+図\ref{アドレスレジスタ_sim}のシミュレーション結果から状態遷移信号が入力されるとそれに対応したアドレスを出力していることが確認できるので、アドレスレジスタが正しく動作していると言える。\par
+最後にSAS認証回路全体についてシミュレーションを行った結果を以下の図\ref{全体_sim}に示す。
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.4]{./SAS-L2_client_wave.eps}
+ \caption{SAS認証回路の波形図}
+ \label{全体_sim}
+\end{figure}
+図\ref{全体_sim}のシミュレーション結果から各モジュールが正しく接続されており、動作していることが確認できた。\par
+
+\section{FPGAにおける実装結果}
+シミュレーションの結果からコンピュータ上では設計したハードウェアが正しく動作していることが確認できたので、次はFPGA上で正しく動作しているかどうかを確認していく。\par
+サーバ側とクライアント側を接続して実行した結果を以下の図\ref{認証成功}に示す。
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=1.0]{./certificationsuc.eps}
+ \caption{認証成功}
+ \label{認証成功}
+ \end{figure}
+ 図\ref{認証成功}から今回設計したSAS認証回路がFPGA上でも正しく$\alpha$を受信して$\beta$を生成し、サーバ側へ送信できていると言える。
+ \begin{figure}[H]
+ \center
+ \includegraphics[scale=1.0]{./updatesuc.eps}
+ \caption{更新成功}
+ \label{更新成功}
+ \end{figure}
+ SAS-L2の認証では、毎回認証が終わるとクライアント側とサーバ側に格納されている認証情報を更新する同期処理が必要である。この同期処理によって、盗聴により認証情報が漏洩した場合でも次回認証では使用できないためリプレイアタックを防ぐことができる。\par
+図\ref{更新成功}はサーバとクライアント間の同期処理が正しく実行できていない結果を示す。\par
+図\ref{認証成功}で認証成功し、$\alpha$、$A_n$、$M_n$を用いて再度認証を行った結果であり、認証失敗となった。これは1度認証成功した段階でクライアント側で$A_n$と$M_n$は更新が行われているが、今回作成したサーバ側の処理では更新を行っていないため2回目の認証では認証失敗になっている。\par
+以上の結果から今回設計したSAS認証回路がFPGA上でも正しく認証情報$A_n$と秘匿情報$M_n$の更新が実行できていると言える。
+
+\chapter{考察}
+　本章では、本研究で設計したSAS認証回路をFPGAに実装した結果についての考察を述べる。\par
+本研究では、SAS-L2のクライアント側の認証処理をハードウェア化してSAS認証回路を設計、FPGAに実装した結果から一連のSAS-L2のクライアント側の認証処理がハードウェアを用いて実現できることを確認することができた。\par
+しかし、本研究の目標であるJTAGの認証機構として実用化するにあたって現在の設計から改良すべき問題点が2つ挙げられる。\par
+1つ目は、データ転送である。本研究で設計したSAS認証回路ではデータ転送を行う際に256bitのデータをやり取りする際にデータの入出力どちらも32bitの端子8本ずつ用いている。\par
+しかし、実際のJTAGではデータの入出力はTDIとTDOの1本ずつで行われているため、今回設計したデータ転送モジュールの入力と出力の端子を1本ずつに削減することが今後の課題となる。\par
+2つ目は、回路面積における問題である。FPGAでは回路規模を表す単位としてロジックセル(LC)の数を利用する。そこで、本研究で設計したSAS認証回路の規模についてを以下の表\ref{logiccell}に示す。
+\begin{table}[htb]
+　\begin{center}
+\caption{SAS認証回路の規模}
+\label{logiccell}
+  \begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{3cm}|} \hline
+   logic cells  &  LUT-Only LCs  &  Register-Only LCs  &  LUT/Register LCs  \\ \hline \hline
+   2570  &  1029  &  253  &  1288 \\ \hline
+  \end{tabular}
+  \end{center}
+\end{table}　\\
+
+表\ref{logiccell}のlogic cellsは回路で使用されているロジックセルの数を表しており、 LUT-Only LCsはLUT(Look Up Table)のみを使用しているロジックセルの数を示している。そして、Register-Only LCsはレジスタのみを使用しているロジックセルの数を示し、LUT/Register LCsはLUTとレジスタの両方を使用しているロジックセルの数を示している。\par
+本研究で設計したSAS認証回路では256bitのデータを取り扱うために256bitのレジスタを使用している。データ受信モジュールで1つ、データ送信モジュールで1つ、そしてステートマシンで演算を行うために2つ用意してそこにデータを格納し演算を行っている。また、認証情報の更新処理で使用する情報を保持しておくために、演算で使用したレジスタとは別に256bitのレジスタをさらに2つ使用しており、合計で6つ使用している。そのため回路規模が増大していると考えられ、レジスタの使用量の削減が今後の課題となる。\par
+これらの問題を解決する方法として256bitの認証データを32bitに分割し、8回の認証処理を行うことで1回の認証とする方法が考えられる。
+
+\chapter{あとがき}
+　本研究ではSAS-L2のクライアント側の認証処理をハードウェア化したSAS認証回路を設計し、FPGAであるMAX10における実装を行った。また、サーバ側の処理をMAX10で利用可能なエンデベッド・プロセッサであるNIOS II上でC言語を用いて実装した。\par
+その結果、SAS-L2の認証処理がハードウェアで実現可能であることを確認することができた。\par
+しかし、設計したSAS認証回路をJTAGの認証機構として実用化するには認証データをJTAGで用いられる信号線で認証データの入出力を行う方法の検討と、SAS-L2の実装のための回路面積の削減方法の検討が今後の課題として挙げられる。\par
+また、従来法である共通鍵暗号方式を用いた認証方式やチャレンジレスポンス認証に基づいた認証方式との比較を行うことでSAS認証回路の導入がJTAGの認証機構の軽量化に繋がることを検証する必要があることも今後の課題として挙げられる。
+
+\acknowledgement
+　本研究を進めるにあたり、懇篤な御指導、御鞭撻を賜わりました本学高橋寛教授に深く御礼申し上げます。\par
+本論文を作成するにあたり、詳細なるご検討、貴重な御教示を頂きました本学高橋寛教授ならびに甲斐博准教授、王森レイ講師に深く御礼申し上げます。\par
+また、審査頂いた本学樋上喜信教授ならびに梶原智之助教に深く御礼申し上げます。\par
+最後に、多大な御協力と貴重な御助言を頂いた計算機/ソフトウェアシステム研究室の諸氏に厚く御礼申し上げます。
+
+\begin{thebibliography}{99}
+\bibitem{JTAGセキュリティ}
+王森レイ、亀山修一、高橋寛 \\
+``JTAGセキュリティ脅威-攻撃の現状とその対策-''\\
+エレクトロニクス実装学会誌、2021年
+\bibitem{JTAG構造}
+``JTAG技術について''\\
+https://www.xjtag.com/ja/about-jtag/jtag-a-technical-overview/、(参照 2022-02-03)
+\bibitem{JTAG認証機構}
+馬　竣、岡本　悠、王　森レイ、甲斐　博、亀山　修一、高橋　寛、清水　明宏\\
+``JTAG認証機構の軽量化設計について''\\
+実装学会春季講演大会論文、2022年
+\bibitem{FPGAstr}
+``組み込みのFPGAとは?仕組み、意味、特徴をわかりやすく解説''\\
+https://www.kumikomi.jp/fpga/、(参照 2022-02-07)
+\bibitem{FPGA}
+芹井滋喜\\
+``50K MAX10搭載! FPGAスタートキット DE10-Lite入門''\\
+CQ出版社、2020年
+%
+%\bibitem{SAS-L2}
+%清水明宏
+%``SAS-L ワンタイムパスワード認証方式について'' 
+%日本ファジィ学会誌，vol.10, no.5, pp.796--803, Oct.\ 1998.
+%
+%
+%\bibitem{Fenton_and_Kaposi_1987}
+%N.E.\ Fenton and A.A.\ Kaposi, 
+%``Metrics and software structure,''
+%Journal of Information and Software Technology,
+%29, pp.301--320, July 1987.
+\end{thebibliography}
+
+%\appendix
+
+%\chapter{その他}
+
+%ここでは番号がすべてアルファベットに変わります．
+
+\end{document}
+
+
