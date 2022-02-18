@@ -1,0 +1,618 @@
+\documentclass{thesis}
+
+% TX Fonts を使う
+\usepackage{txfonts}
+\usepackage{listings,jlisting}
+%\usepackage{url}%%% パッケージ url を読み込む:
+%\graphicspath{{C:/Users/yasuhara/OneDrive - 愛媛大学/卒論テンプレ}}
+%\usepackage[dvipdfmx]{graphicx}
+
+
+
+\begin{document}
+
+\lstset{
+	%プログラム言語(複数の言語に対応，C,C++も可)
+ 	language = Python,
+ 	%枠外に行った時の自動改行
+ 	breaklines = true,
+ 	%自動改行後のインデント量(デフォルトでは20[pt])	
+ 	%breakindent = 10pt,
+ 	%標準の書体
+ 	basicstyle = \ttfamily\scriptsize,
+ 	%コメントの書体
+ 	%commentstyle = {\itshape \color[cmyk]{1,0.4,1,0}},
+ 	%関数名等の色の設定
+ 	%classoffset = 0,
+ 	%キーワード(int, ifなど)の書体
+ 	%keywordstyle = {\bfseries \color[cmyk]{0,1,0,0}},
+ 	%表示する文字の書体
+ 	%stringstyle = {\ttfamily \color[rgb]{0,0,1}},
+ 	%枠 "t"は上に線を記載, "T"は上に二重線を記載
+	%他オプション：leftline，topline，bottomline，lines，single，shadowbox
+ 	%frame = TBrl,
+ 	%frameまでの間隔(行番号とプログラムの間)
+ 	%framesep = 5pt,
+ 	%行番号の位置
+ 	%numbers = left,
+	%行番号の間隔
+ 	%stepnumber = 1,
+	%行番号の書体
+ 	%numberstyle = \tiny,
+	%タブの大きさ
+ 	tabsize = 1,
+ 	%キャプションの場所("tb"ならば上下両方に記載)
+ 	%captionpos = t
+}
+
+
+% 目次
+\tableofcontents
+
+\chapter{序論}
+
+近年，ネットワークの高度化やパソコン，スマートフォンの普及によるインターネット利用者の増加により，マルウェアも増加傾向にある\cite{McafeeLabs脅威レポート}．それに伴い，ネットワーク通信を介して情報漏洩やデータの改ざん，マルウェアなどの脅威に晒される可能性が高まってきており，それらの対策を企業などの組織だけでなく個人でも講じておくことが重要になっていると考えられる．
+
+マルウェアに感染したコンピュータは，意図せず異常な通信を行うことが知られている．そこで，パケットの送受信状況を監視することでマルウェアの検知，早期対処を行ったり，感染時の通信状況を見ることでその感染の原因，被害状況を把握することができる．
+
+パケットを通じて通信状況を把握する研究は盛んに．例として，独立行政法人情報通信研究機構(NICT)が推進するNICTER(Network Incident analysis Center for Tactical Emergency Response)\cite{NICTER}と呼ばれる研究プロジェクトがある．このプロジェクトでは，ダークネットと呼ばれる未使用のIPアドレスに到達するパケットの情報を分析し，可視化することで直感的に分かりやすく通信状況を把握できるシステムを開発している．ただし，このNICTERは大規模なシステム向けに開発されており，個人のコンピュータの監視には向いていない．個人がパケットを観察するツールはWireshark\cite{Wireshark}やtcpdump\cite{tcpdump}などが存在するが，これらは文字情報のみで分析結果を表示するため通信状況を直感的に理解しにくいことや，結果を把握するにはプロトコルやIPアドレス等の知識が必要であることから万人が通信状況を理解するのは難しいという課題もある．
+
+これらの課題に対して，田村らの研究ではホワイトリスト方式で地球儀上にパケットを可視化させるシステムの開発を行っている\cite{tamura}．ホワイトリスト方式とは，信頼できる通信のみをリスト化し，リストと一致しない場合に警告や遮断を行う異常検知手法である．この方式では，正常な通信を異常な通信とみなすフォールスポジティブなどの誤検知のリスクが高まってしまうため，検知精度に課題が残る．また，信頼できる通信を自身で判断し，ホワイトリストの設定を行う必要があるため情報工学の知識が必要となり，万人が利用するシステムには向いていない方式と言える．
+
+そこで，本研究ではリアルタイムの通信状況からブラックリスト方式で異常通信を検知し，その結果をパケット情報とともに可視化する個人向けシステムの開発を行う．ブラックリスト方式とは，信頼できる専門家などによって既知の攻撃パターンをリスト化し，通信時にリストとのマッチングで一致した場合に警告を出す，あるいは通信を遮断する方式である．情報工学の知識を有した専門家がブラックリストを日々更新している事が多く，それらを利用すれば設定などをする必要なく異常通信を検知することができる．
+
+以下，2章ではインターネットの仕組みと不正通信の検知方法について述べる．3章ではパケットの分析と可視化に関する研究について述べる．4章では本研究で提案するシステムの構成とシステム評価について述べる．最後に，5章では本研究のまとめと今後の課題について述べる．
+
+\chapter{インターネットと異常通信検知手法}
+
+\indent マルウェアに感染したコンピュータの多くは，インターネットを介した異常通信を行う．この異常通信を観測するには，インターネット通信の仕組みを知ることが不可欠である．そこで，本章ではインターネット通信の仕組みと，通信の分析に必要な情報の取得方法，異常通信の検知手法について述べる．
+
+\section{プロトコルの役割}
+
+コンピュータネットワークにはTCPやIPをはじめとした複数のプロトコルが必要であり，TCP/IPはこれらを総称したプロトコル群のことである．現在，TCP/IPはコンピュータネットワークにおいて最も利用されているプロトコル群である．TCP/IPのプロトコルは役割ごとに階層化することができる．この階層モデルを図\ref{fig:TCP/IP}に示す．
+
+\begin{figure}[H]
+	\centering
+	\begin{tabular}{|c|} \hline
+		アプリケーション層 \\
+		TELNET, SSH, HTTP, SMTP, POP, \\
+		SSH/TLS, FTP, MIME, HTML, \\
+		SNMP, MIB, SIP, RTP, ．．． \\ \hline
+
+		トランスポート層 \\
+		TCP, UDP, UDP-Lite, SCTP, DCCP \\ \hline
+
+		インターネット層 \\
+		ARP, IPv4, IPv6, ICMP, IPsec \\ \hline
+
+		ネットワークインタフェース層 \\ \hline
+
+		(ハードウェア) \\ \hline
+	\end{tabular}
+	\caption{TCP/IPの階層モデル}
+	\label{fig:TCP/IP}
+\end{figure}
+
+TCP/IPによる通信では，送信側はアプリケーション層で作成したメッセージを分割し，下位層に順番に渡す．この時，各層では上位層から渡されたデータにヘッダを付加する．こうして送信データにヘッダを重ねていったものがパケットとなる．最終的に送信するパケットの構造の一例を図\ref{fig:パケット}に示す．
+
+\begin{figure}[H]
+	\centering
+	\includegraphics{./img/packet.eps}
+	\caption{パケットの構造の一例}
+	\label{fig:パケット}
+\end{figure}
+
+
+受信側は送信側からパケットを受け取り，下位層から上位層へとパケットを渡す．この時各層でパケットのヘッダを解析することで，どのようなプロトコルが使われているかがわかり，適当な上位層へデータを渡すことができる．
+
+以下に，TCP/IP階層モデルの各層の詳細を述べる．
+
+\subsection*{ネットワークインタフェース層}\label{sec:eth}
+ネットワークインタフェース層は，データリンクを利用して通信を行うためのインタフェースとなる階層である．ネットワークインタフェース層で扱うパケットのことを特にフレームという．データリンクの中で現在最も普及しているのがEthernetであり，Ethernet で伝達されるフレームはすべて Ethernet フレームとして運ばれる．Ethernet の中でもいくつか異なる仕様が存在するが，そのフォーマットは 2 種類に大別される．Ethernet のフレームフォーマットを図 \ref{fig:eth} に示す．
+\begin{figure}[H]
+	\centering
+	\includegraphics{img/ethernet.eps}
+	\caption{Ethernetフレームフォーマット}
+	\label{fig:eth}
+\end{figure}
+
+\subsection*{インターネット層}\label{sec:ip}
+インターネット層は，宛先までデータを届ける役割を持つ階層である．インターネット層では，IP(Internet Protocol)が支配的に用いられる．IPはパケットが宛先に正しく届いたかを保証しない．このように保証のないパケットのことを特にデータグラムという．現在用いられているIPにはバージョン4(IPv4)とバージョン6(IPv6)があるが，ここでは特に主要に用いられているIPv4について述べる．
+
+\begin{figure}[H]
+	\centering
+	\includegraphics{./img/ip_header.eps}
+	\caption{IPv4ヘッダフォーマット}
+	\label{fig:ipv4}
+\end{figure}
+\noindent
+図\ref{fig:ipv4}はIPv4のヘッダフォーマットを示した図である．この図に示す通り，IPヘッダ内に送信元・宛先IPアドレスが示されており，このおかげでインターネットを介してパケットをやり取りすることができる．そのため，インターネットに接続されるすべてのホストやルータは，必ず IP の機能を備えていなければならない．
+
+\subsection*{トランスポート層}
+トランスポート層の最も重要な役割は，アプリケーション間の通信を実現することである．これは，コンピュータ内部では複数のアプリケーションが同時に動作しており，どのプログラム同士が通信しているのかを識別する必要があるためである．これには，ポート番号という識別子が使われる．
+
+トランスポート層では代表的なプロトコルが2つ存在する．
+
+TCP(Transmission Control Protocol)は，コネクション型で信頼性を持つプロトコルである．もし通信経路の途中でデータの損失や入れ替わりが発生しても，TCPによって解決することができる．ただし，信頼性を高める代わりに制御のパケットをやり取りする必要があり，一定間隔で決められた量のデータを転送するような通信にはあまり向いていない．
+
+UDP(User Datagram Protocol)は，コネクションレス型で信頼性のないプロトコルである．TCPとは違い，送信したデータが宛先に届いているかの確認をしないため，データの損失や入れ替わりの確認はアプリケーション側で行う必要がある．しかし，確認しない代わりに効率よく通信を行うことができ，パケット数が少ない通信や，音声通信等の一定間隔の通信に向いたプロトコルと言える．
+
+
+\subsection*{アプリケーション層}
+アプリケーション層では，アプリケーション内で行われるような処理を行う．ネットワークを利用するアプリケーションでは，アプリケーション特有の通信処理が必要である．アプリケーション特有の通信処理にあたるのがアプリケーションプロトコルである．アプリケーションプロトコルは，ブラウザとサーバー間の通信に使われるHTTPや電子メールの送受信に用いられるSMTP等がある．
+
+
+\section{異常通信の検知手法}
+
+1章で述べたように，マルウェアに感染したコンピュータは意図せず異常な通信を行い，次のコンピュータへとマルウェアを感染させていく事が知られている．本研究では，近年社会問題となっているマルウェア増加に対してこれらの異常通信を検知し，マルウェア感染の早期発見，対処をすることで対策を行う．
+
+本節では，異常通信を検知するために用いる異常通信検知手法を述べる．
+異常通信を検知する手法は，大きくブラックリスト方式，ホワイトリスト方式，アノマリ型検知の3つに分類することができる\cite{white}．
+
+\subsection*{ブラックリスト方式}
+
+ブラックリスト方式は信頼できる専門家などによって既知の攻撃パターンをリスト化し，通信時にリストとのマッチングで一致した場合に警告を出す（あるいは通信を遮断する）方式である．過去の攻撃に合致したパターンのみを検知するため，正常な状態を異常とみなすこと（フォールスポジティブ）が少ないという特徴がある．しかし，未知の攻撃に対してはパターンを適用することができず，異常を見逃してしまうこと（フォールスネガティブ）が起こってしまうことがある．
+
+\subsection*{ホワイトリスト方式}
+
+ホワイトリスト方式は，信頼できる通信のみをリスト化し，リストと一致しない場合に警告や遮断を行う方式である．ブラックリスト方式とは対照的に，フォールスネガティブは少なく，攻撃被害への耐性は高い．一方で，フォールスポジティブに伴う通信の遮断によってサービス停止を招いてしまうリスクも高まることから，安全性と運用上のコストは両立しにくいと言える．
+
+\subsection*{アノマリ型検知}
+
+アノマリ型検知は，通常の状態のプロファイルを設定しておき，これに違反した場合に異常とみなす検知の方法である．ブラックリスト方式と比較して異常の定義が広いため，フォールスポジティブが比較的多くなってしまうが，プロファイルの閾値を調整することで誤検知を減らすことができる．また，この方法では，過去に観測されていない未知の攻撃に対しても対応できるというメリットがある．
+
+
+\vspace{0.2in}
+以上が代表的な異常通信の検知手法であるが，どの方法にもメリットとデメリットがそれぞれ存在するため，互いのデメリットを補うために複数の方法を組み合わせて実装することが多い．
+
+
+
+\chapter{パケットの分析と可視化}
+
+本章では，ユーザのコンピュータ上でパケットを分析する手法と，現在研究開発が進んでいるパケット可視化に関する研究について述べる．
+
+
+\section{ツールを用いたパケットの分析手法} \label{sec:ツールを用いたパケットの分析手法}
+
+ユーザがコンピュータ上のパケットを分析する際には，専らパケットキャプチャツールが利用される．パケットキャプチャツールの中から，ここでは一例としてWireshark\cite{Wireshark}とtcpdump\cite{tcpdump}について説明する．
+
+\subsection*{Wireshark}
+
+Wiresharkはパケット分析において最も普及しているツールである．Wiresharkは豊富な機能を持っている．その一部を以下に示す．
+
+\begin{itemize}
+\item 何百ものプロトコルを常に詳細に検査する
+\item リアルタイムでのパケットキャプチャとオフライン分析
+\item マルチプラットフォーム:Windows，Linux，MacOSなど，多くのプラットフォーム上で動作可能
+\item パケットの特徴ごとに色分けして表示することで直感的にフィルタリングを理解可能にする
+\item XML，CSV，またはプレーンテキストに出力することが可能
+\end{itemize}
+
+\begin{figure}[H]
+ \center
+ \includegraphics[width=12cm]{./img/wire.eps}
+ \caption{Wiresharkを用いたパケット分析}
+ \label{fig:wireshark}
+\end{figure}
+
+Wiresharkを起動し，ネットワークインタフェースを指定してキャプチャを開始すると，図\ref{fig:wireshark}のようにリアルタイムに取得したパケットが表示される．
+パケットリストは独自の方法で色分けされている．パケットリストからパケットを選択すると，さらに詳細なパケット情報が表示される．
+このように，知りたいパケットを見つけて詳細情報を確認することで，通信状況の分析を行う．
+
+\subsection*{tcpdump}
+
+tcpdumpはネットワーク通信のデータを収集し，結果を出力する分析ツールである．
+
+図\ref{fig:tcpdump}のようにパケット取得日時，送信元，宛先IPアドレスだけでなく，どのようなフラグ(SYN,ACK,FIN等)のパケットが送られたかがわかるようになっている．ほかの分析ツールと比較してリソース消費が少ないなどといった利点がある．
+
+
+\begin{figure}[H]
+ \center
+ \includegraphics[width=15cm]{./img/tcpdump.eps}
+ \caption{tcpdumpを用いたパケット分析}
+ \label{fig:tcpdump}
+\end{figure}
+
+しかし，2つのツールともに，アドレスやプロトコルなどの専門的な用語が表示されており，これらの用語の意味を知らない人にとってはどこが異常かを判別するのは難しい．Wiresharkやtcpdumpに限らずほとんどのパケットキャプチャツールについても同様の事が言える．
+
+
+\section{侵入検知ツール}
+\ref{sec:ツールを用いたパケットの分析手法}節で述べたツールを用いた手法は，異常の有無をユーザが能動的に調べるための手法であった．これに対して，異常通信を自動的に発見する手段として現在最も利用されているのが，侵入検知システム(Intrusion Detection System, IDS)を用いた方法である．IDSはネットワークへの異常な通信を検知し，管理者に知らせる機能を持ったソフトウェアもしくはハードウェアのことである．
+
+ここではオープンソースのソフトウェアIDSの中から，一例としてSuricataとMaltrailについて述べる．
+
+\subsection*{Suricata} 
+
+Suricata\cite{Suricata}は，ブラックリスト方式で異常通信を検知する高性能のネットワークIDS，およびネットワークセキュリティ監視ツールである．このツールは，コミュニティが運営する非営利団体であるOpen Information Security Foundation (OISF)によって開発されている．
+
+使用するブラックリストとして，ルールと呼ばれるコミュニティ，およびユーザーが定義したリストを使用してネットワークトラフィックを調べ，異常を検出する．
+デフォルトではIDSとして機能するが，異常を検知した場合にその通信を遮断する侵入防止システム(IPS)としても利用できるツールである．
+
+以下にSuricataの特徴を述べる．
+
+\begin{itemize}
+\item 異常を検知するだけでなく，その原因となったマルウェアをダウンロードできる
+\item パケットよりも上の階層であるTLS/SSl証明書，HTTPリクエスト，DNSリクエストなどもログに記録できる
+\item クロスプラットフォームサポート-Linux，Windows，macOS，OpenBSDなど
+\end{itemize}
+
+
+\subsection*{Maltrail} \label{sec:Maltrail}
+
+Maltrail\cite{Maltrail}は，先ほど述べたSuricataと同様にブラックリスト方式で異常通信を検知するトラフィック検出システムである．ブラックリストは，Web上で一般公開されている様々なブラックリストを使用している．
+
+以下にMaltrailの特徴を述べる．
+
+\begin{itemize}
+\item 様々なアンチウイルスレポートや静的トレイルに加え，ドメイン名・URL・IPアドレス・HTTPユーザエージェントヘッダ値の痕跡を利用する
+\item 新しいマルウェアなどの未知の脅威の発見に役立つ高度なヒューリスティックメカニズムやホワイトリスト方式での検知を併用できる
+\end{itemize}
+
+Maltrailは他のツールと比較して使用するブラックリストが多く，より多くのマルウェア検出に役立つと考えられる．そこで，本研究のシステムにMaltrailが取得するブラックリストを使用する．
+
+\section{トラフィック可視化システム}
+
+本節では，企業や非営利団体が開発を行っているトラフィック可視化システムについて述べる．
+
+\subsection*{NICTER} \label{sec:NICTER}
+
+独立行政法人情報処理研究機構(NICT)が進めている研究にNICTER(Network Incident analysis Center for Tactical Emergency Response)\cite{NICTER}がある．NICTERは「インターネット上で時々刻々と発生しているセキュリティインシデントへの迅速な対応」を目的としており，インターネット上で生起する多種多様な事象の収集および分析を実施している．また，NICTERで行われている研究の一つがパケットの可視化である．
+
+\begin{figure}[H]
+ \center
+ \includegraphics[width=15cm]{./img/Atlas.eps}
+ \caption{Atlasによるサイバー攻撃の可視化}
+ \label{fig:Atlas}
+\end{figure}
+
+図\ref{fig:Atlas}はAtlas\cite{atlas}と呼ばれるダークネットに届くパケットを，世界地図上でアニメーション表示する可視化システムである．図\ref{fig:Atlas}では，日本国内のセンサに届いたパケットに対してリアルタイムに行われている攻撃を可視化しており，世界地図上の各国から日本に向けてデータが飛んでくる様子がわかる．Atlasはトラフィックを単に可視化するだけでなく，高さでポート番号，色でプロトコルを示すことで，わかりやすく，多くの情報を理解可能にしている．専門知識のない人でも見るだけで状況を把握でき，専門知識がある人ならさらに詳しい分析を行えるようになっている．
+
+\begin{figure}[H]
+ \center
+ \includegraphics[width=15cm]{./img/nirvana.eps}
+ \caption{NIRVANA改によるサイバー攻撃の可視化}
+ \label{fig:nirvana}
+\end{figure}
+
+図\ref{fig:nirvana}はNIRVANA(NIcter Real-time Visual ANAlyzer)改と呼ばれるNICTERの可視化技術を用いて作られたリアルタイムネットワーク可視化システムである．このシステムは組織内ネットワークの通信状況を可視化するだけでなく，サイバー攻撃に関連した異常通信を検知し，警告を表示する事も可能である．球体がインターネット全体，中央のパネルが組織内のネットワーク，白い目印が警告を表現している．通信の様子が可視化されており，通信状況を見るだけで理解することができる．
+
+
+\subsection*{CYBERTHREAT REAL-TIME MAP} \label{sec:MAP}
+
+CYBERTHREAT REAL-TIME MAP\cite{kas}は，カスペルスキーが同社のセキュリティ製品を利用して収集したデータを可視化するシステムである．
+図\ref{fig:kas}にCYBERTHREAT REAL-TIME MAPを示す．
+
+\begin{figure}[H]
+ \center
+ \includegraphics[width=15cm]{./img/kas.eps}
+ \caption{CYBERTHREAT REAL-TIME MAPによる攻撃の可視化}
+ \label{fig:kas}
+\end{figure}
+
+図\ref{fig:kas}を見ると，様々な国同士で攻撃が行われていることが分かる．色ごとに「ファイルを開く/実行/保存/コピーしたときに検知されたマルウェア」，「Webページを開いた際に検知されたマルウェア」，「IDSで検知されたマルウェア」などが可視化されており，見るだけで攻撃の内容が分かる可視化ツールであると言える．
+
+\vspace{0.2in}
+上述のトラフィック可視化システムから，通信や攻撃の可視化は通信状況，被害状況を把握する上で有用な手法であると言える．
+
+
+\chapter{パケット可視化システムの開発と評価}
+
+本研究では次の3つの条件を満たすパケット可視化システムを開発した．
+
+\begin{itemize}
+\item リアルタイムに流れるパケットを取得，分析できる．
+\item ブラックリストを参照し，異常を検知できる．
+\item 可視化システムの画面上で通信(被害)状況がわかる．
+\end{itemize}
+
+\section{実装環境}
+
+本研究のパケット可視化システムの開発に使用した環境について表\ref{tb:kankyou}に示す．
+
+\begin{table}[htbp]
+  \centering
+  \caption{開発環境}
+  \scalebox{1.1}{
+   \begin{tabular}{l|l}  \hline
+     ホストOS & Windows10 Pro  \\ \hline
+     メモリ & 16GB \\ \hline
+     CPU & Intel(R) Core(TM)i7-7700 \\ \hline
+     仮想環境 & Hyper-V \\ \hline
+     ゲストOS & Ubuntu20.04 LTS \\ \hline
+     Webブラウザ & Google Chrome version 77.0.3865.120 \\ \hline
+   \end{tabular}
+  }
+  \label{tb:kankyou}
+\end{table}
+
+\section{システム詳細}
+
+本研究で開発したシステムは，次の3つの機能により構成される．
+
+\begin{itemize}
+\item パケット情報取得
+\item 異常パケット判定
+\item 異常パケット可視化
+\end{itemize}
+
+
+本システムでは，パケット情報取得機能，異常パケット判定機能をMaltrailのプログラムを利用して実装し，図\ref{fig:flow}に示す流れで処理を行う．
+
+
+%\begin{figure}[H]
+% \center
+% \includegraphics[width=15cm]{./img/flow.png}
+% \caption{処理の流れ}
+% \label{fig:flow}
+%\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\columnwidth]{./img/flow.png}
+  \caption{処理の流れ}
+  \label{fig:flow}
+\end{figure}
+
+
+
+パケット取得については\ref{sec:パケット情報取得}節で，異常パケット判定については\ref{sec:異常パケット判定}節で，パケット可視化については\ref{sec:異常パケット可視化}節でそれぞれ詳細を述べる．
+
+\subsection{パケット情報取得} \label{sec:パケット情報取得}
+
+送受信されるパケットから情報を取得する．求めるパケット情報は取得日時，送信元・宛先IPアドレス，プロトコル，送信元ポート番号(TCP/UDPのみ)，パケット長とする．なお，本研究では検知対象とするパケットは，IPv4パケットとする．
+
+パケットを取得する際にはパケット解析APIであるlibpcap\cite{tcpdump}を利用した．libpcapにはパケットキャプチャのための関数があり，それらを実装システムに対して用いる．
+
+まず，pcap\_findalldevsという関数で，コンピュータ上のデバイスを列挙し，配列に格納する．取得した配列からデバイスを1つ選択し，デバイスを開くための関数であるpcap\_open\_live関数に渡す．この関数では，プロミスキャスモード(パケットを無差別に取得する状態)にするかどうかを選択することができる．開発システムではすべてのパケットを取得するため，プロミスキャスモードで動作させる．
+デバイスを開いた後，pcap.next関数でパケットを取得する．このpcap.next関数をwhile文によってループさせることでパケットを取得し続けるようにする．
+
+
+\subsection{異常パケット判定} \label{sec:異常パケット判定}
+
+本システムでは，\ref{sec:Maltrail}節で述べたMaltrailが取得するブラックリストを用いた異常パケット判定を行う．
+
+\subsection*{Maltrailが取得するブラックリスト}
+
+MaltrailはWebページで公開されている様々なブラックリストを取得している．取得するブラックリストを以下の図\ref{fig:black}に示す．
+
+\begin{figure}[H]
+	\centering
+	\begin{tabular}{|l|} \hline
+		360bigviktor,360conficker,360cryptolocker,360locky,360necurs,360suppobox,360tofsee, \\
+		360virut, abuseipdb,alienvault,atmos, bitcoinnodes,blocklist, botscout, bruteforceblocker, ciarmy,\\
+		cruzit, cybercrimetracker,dataplane, dshieldip,emergingthreatsbot, emergingthreatscip,\\ 
+		emergingthreatsdns, fareit,feodotrackerip,gpfcomics,greensnow,ipnoise,kriskinteldns,kriskintelip,\\
+		malc0de,malwaredomainkistdns, malwaredomains,maxmind,minerchk,myip,openphish,palevotracker, \\
+		proxylists,proxyspy,ransomwaretrackerdns, ransomwaretrackerip,ransomwaretrackerurl,rutgers,sblam,\\
+		scriptzteam,socksproxy,sslbl,sslproxies,statics, talosintelligence,torproject,trickbot,urlhaus,viriback,\\
+		vxvault,zeustrackermonitor,zeustrackerurl.\\ \hline
+	\end{tabular}
+	\caption{Maltrailが取得するブラックリスト}
+	\label{fig:black}
+\end{figure}
+
+図\ref{fig:black}を見ると，様々なサイトからブラックリストを取得していることが分かる．このブラックリストの中から一例を紹介する．
+
+\subsubsection*{MYIP.MS}
+
+MYIP.MS\cite{myip}は自身のIPアドレスや，様々なWebサイト，企業などのIPアドレスを調べることができるIPデータベースサイトである．
+このサイトでは，独自のマルウェア，ボット検知システムを用いて異常なIPアドレスを判別する，またはサイトのコミュニティのユーザが報告することで，ブラックリストを作成している．
+
+MYIP.MSのWebページを図\ref{fig:myip}に示す．
+
+\begin{figure}[H]
+ \center
+ \includegraphics[width=15cm]{./img/myip.eps}
+ \caption{MYIP.MS}
+ \label{fig:myip}
+\end{figure}
+
+図\ref{fig:myip}の下半分を見ると，リアルタイムで活動している異常なIPアドレスがまとめられており，国籍やどのような種類のマルウェアなのかなどの詳細情報がわかる．
+
+\subsubsection*{abuse.ch}
+
+abuse.ch\cite{abuse.ch}はベルン応用科学大学の研究プロジェクトで，主に異常なSSL証明書，JA3フィンガープリントの原因となるマルウェア，ボットの特定と追跡を行っている．
+このプロジェクトのデータはすでに多くの商用，およびオープンソースのセキュリティ製品に統合されており，セキュリティソフトウェアのベンダーだけでなく政府機関，インターネットプロバイダなども利用している．
+
+abuse.chで提供されているブラックリストを以下の図\ref{fig:abuse}に示す．
+
+\begin{figure}[htbp]
+\begin{center}
+  \begin{tabular}{c}
+
+    % 1枚目の画像
+    \begin{minipage}[b]{0.5\hsize}
+      \begin{center}
+        \includegraphics[clip, width=70mm]{./img/abuse4.eps}
+        \hspace{1.7cm} (a)異常なSSL証明書のブラックリスト
+      \end{center}
+    \end{minipage}
+
+    % 2枚目の画像
+    \begin{minipage}[b]{0.5\hsize}
+      \begin{center}
+        \includegraphics[clip, width=70mm]{./img/abuse5.eps}
+        \hspace{1.7cm} (b)ブラックリストの上から1行目の詳細情報
+      \end{center}
+    \end{minipage}
+
+  \end{tabular}
+  \caption{abuse.chのブラックリスト}
+  \label{fig:abuse}
+  \end{center}
+\end{figure}
+
+abuse.chでは図\ref{fig:abuse}(a)のようにブラックリストがまとめられている．図\ref{fig:abuse}(b)は図\ref{fig:abuse}(a)のリンクをクリックした後のページを示す．IPアドレスやポート番号，どのような種類のマルウェアなのかを見ることができる．
+
+\vspace{0.2in}
+Maltrailは上述のようなサイト以外にも様々なサイトから同様の情報を取得し，CSVファイルへ格納して独自のブラックリストを作成している．
+
+本システムの異常パケット判定法では，パケットを取得したとき，ドメイン名，IPアドレスをブラックリストおよびホワイトリストと照合し，ブラックリスト内に一致するものがあり，ホワイトリスト内に一致するものがなければ異常とする．それ以外の場合はすべて正常な通信とみなす．%異常パケット判定法を以下の表\ref{tb:hantei}に示す．
+
+%\begin{table}[htbp]
+%  \centering
+%  \caption{異常パケット判定法}
+%  \scalebox{1.1}{
+%   \begin{tabular}{|l|l|l|}  \hline
+%     ブラックリスト & ホワイトリスト & 異常判定 \\ \hline
+%     一致 & 一致しない & 異常 \\ \hline
+%     一致 & 一致 & 正常 \\ \hline
+%    一致しない & 一致 & 正常 \\ \hline
+%     一致しない & 一致しない & 正常 \\ \hline
+%   \end{tabular}
+%  }
+%  \label{tb:hantei}
+%\end{table}
+
+Maltrailにはブラックリストに書き込まれていない未知の異常通信についても検知する機能があるが，本研究では実際に未知の異常通信を検知，可視化することが困難なため利用しないこととする．
+異常通信を検知した場合は，パケット情報をWebページ上に表示し，可視化する．
+
+\subsection{異常パケット可視化} \label{sec:異常パケット可視化}
+
+本研究で開発したシステムでは異常パケット情報をWebブラウザで読み込み，可視化処理を行う．
+本節では，可視化に用いる技術と可視化方法について述べる．
+
+\subsection*{canvas要素}
+Web上での動画表現にはHTML5の，canvas要素を用いた表現を用いることができる．canvas要素はHTMLの要素の一つであり，最新版のウェブブラウザでは標準でサポートしている．canvas要素の編集はJavaScriptによって行う．また，HTMLの他の要素と連携した処理を実装したり，PHP等の他のウェブ系のスクリプト言語と組み合わせることもでき，幅広い表現を実現することができる．
+
+\subsection*{WebGL}
+トラフィックの可視化には3DグラフィクスAPIであるWebGLを用いる．WebGLはウェブブラウザ上で3DCGを表示させるための標準仕様であり，現在の主要ブラウザの最新版なら利用することができる．別の3DCG APIであるOpenGLを基本に開発されており，ブラウザ上では一般的に利用されている．
+
+WebGLはHTML5のcanvas要素とJavaScriptを用いて表示させるため，Web系の他のスクリプト言語とデータの交換が容易である．そのため，ローカルのファイルやデータベースとの連携も容易に行うことができる．
+
+本システムでは\ref{sec:パケット情報取得} 節で取得したパケット情報に対し，ブラックリストおよびホワイトリストを用いて異常判定を行う．その後，異常パケットを検知した場合にプロセス間通信を用いてパケット情報をJSON形式で受信し，受信したパケット情報をWebGLを用いて可視化する．
+
+\subsection*{可視化グラフィック}
+可視化した情報の画面について説明する(図\ref{fig:実行結果}，図\ref{fig:文字ベース})．canvas要素を用いた表示領域上に，座標(緯度・経度)を設定した半透明の地球儀オブジェクトを表示する．地球儀オブジェクトの中心には自分のPCに見立てたオブジェクトを表示する．パケットのIPアドレスから座標を割り出し，自分のPCと通信相手の場所を直線で結び，その上をパケットに見立てた球体オブジェクトを流すことでトラフィックを表現する．直線，球体オブジェクトともに赤色で表示する．
+
+座標の特定にはGeoIPを用いる．GeoIPはMaxMind社が提供する，IPアドレスから地理情報を得る仕組みである．提案システムでは，パケットキャプチャの際，GeoIP関数にパケット情報の送信元IPアドレスおよび宛先IPアドレスを与えることで地理情報(緯度・経度，国コード)を取得する．可視化時に，得られた地理情報を地球儀の座標と対応させる．
+
+\section{実行結果} \label{sec:実行結果}
+
+開発システムを用いてリアルタイムで異常パケットを可視化する．pingコマンドを用いてブラックリストに書き込まれている，かつホワイトリストに書き込まれていないIPアドレス"136.161.101.53"と通信を行った結果を図\ref{fig:実行結果}に示す．
+
+\begin{figure}[H]
+ \center
+ \includegraphics[width=15cm]{./img/kekka1.eps}
+ \caption{開発システムの実行結果}
+ \label{fig:実行結果}
+\end{figure}
+
+
+図\ref{fig:実行結果}は中央の四角のオブジェクトが自身のPCを表したもので，IPアドレス"136.161.101.53"(アメリカ)と通信を行った状況を示す．図\ref{fig:実行結果}は検知された異常通信が赤色の直線で可視化され，その直線上に赤い球体のオブジェクトが表示される．
+
+また，左上のタブは図\ref{fig:文字ベース}のような文字ベースのパケット情報を表示するために用いる．
+
+\begin{figure}[H]
+ \center
+ \includegraphics[width=15cm]{./img/kekkatab.eps}
+ \caption{文字ベースのパケット情報のログ}
+ \label{fig:文字ベース}
+\end{figure}
+
+図\ref{fig:文字ベース}では，過去に行った異常通信の日時，国籍，送信元IPアドレス，宛先IPアドレス，プロトコル，パケット長をログとして表示している．
+
+\section{システム評価}
+
+今回，愛媛大学工学部情報工学科ソフトウェアシステム研究室の学部生5名に開発したシステムを利用してもらい，自由記述でコメントを依頼し，評価を行った．
+
+評価点
+
+\begin{itemize}
+	\item 地球のどこと通信しているかどうかが見えて分かりやすい．
+	\item 文字情報としてパケットの詳細情報も確認できる点が良い．
+\end{itemize}
+
+改善点
+
+\begin{itemize}
+	\item 文字ベースでの情報表示の部分で，自身のPCのIPアドレスがどれなのか分かりにくい．
+\end{itemize}
+
+改善点の指摘にあるように文字情報の表示方法については課題が残る．
+
+\chapter{結論}
+
+本研究では個人PC向けのブラックリストを用いた異常パケット可視化システムの開発を行った．本研究で開発したシステムはリアルタイムでパケットを取得し，ブラックリストおよびホワイトリストを用いて異常通信を判定し，可視化を行う．可視化情報を有していることで，従来の文字情報で通信状況を分析するシステムと比較して画面を見るだけで通信状況を理解しやすい．また，本システムではMaltrailを利用してWeb上で公開されている様々なブラックリストを取得し，ホワイトリストと併用して異常通信の検知に利用している。ブラックリストおよびホワイトリストどちらとも異常とみなした場合のみ異常通信と判定するため，田村らの研究で開発されているシステムと比較して誤検知は少ない．
+
+しかし，異常パケットが多数観測された場合はリアルタイムにパケットの表示ができなくなることがある。パケットを多数可視化するための実装は今後の課題である。また、システム評価で得られた意見をもとにして文字情報の表示方法の改良も今後の課題である
+
+\acknowledgement
+
+本研究を進めるにあたり，常日頃より丁寧かつ熱心なご指導を頂きました，高橋寛教授，甲斐博准教授，王森玲講師に深く感謝いたします．
+
+また，本研究に際してご査読いただいた遠藤 慶一准教授，宇戸 寿幸准教授に感謝の意を表します．
+
+最後に，本研究において多大なご協力を頂きました諸先輩方，ならびに同研究室の同期生に厚くお礼申し上げます．
+
+\begin{thebibliography}{99}
+\bibitem{McafeeLabs脅威レポート}
+McafeeLabs，
+``脅威レポート:2021年6月'',
+Mcafee.com，2021， 
+https://www.mcafee.com/enterprise/ja-jp/assets/reports/rp-threats-jun-2021.pdf, (2022.1.31参照)
+%
+\bibitem{NICTER}
+中尾康二, 松本文子, 井上大介, 馬場俊輔, 鈴木和也, 衛藤将史, 吉岡克成,
+力武健次, 堀良彰: インシデント分析センタNICTERの可視化技術,
+電子情報通信学会技術研究報告． ISEC, 情報セキュリティ,
+Vol.106, Number 176, pp.83-89 (2006)．
+%
+\bibitem{Wireshark}
+Wireshark．https://www.wireshark.org/, (2022.1.31参照)
+%
+\bibitem{tcpdump}
+TCPDUMP \& LIBPCAP． https://www.tcpdump.org/, (2022. 1.31参照)
+%
+\bibitem{tamura}
+田村 尚規: パケット分析に基づく個人のPCのトラフィック可視化に関する研究． 愛媛大学理工学研究科電子情報工学専攻ソフトウェアシステム研究室, (2017)
+%
+\bibitem{white}
+Sandro Etalle, Clifford Gregory, Damiano Bolzoni, Emmanuele Zambon:
+Self-configuring deep protocol network whitelisting,
+Security Matters Whitepapers,  pp.1-24 (2014)．
+%
+\bibitem{Suricata}
+Suricata． https://suricata.io/, (2022.1.31参照)
+%
+\bibitem{Maltrail}
+Maltrail． https://github.com/stamparm/MalTrail, (2022.1.31参照)
+%
+\bibitem{atlas}
+Atlas． https://www.nicter.jp/atlas, (2022.1.31参照)
+%
+\bibitem{kas}
+CIBERTHREAT REAL-TIME MAP, https://cybermap.kaspersky.com/ja, (2022.1.31参照)
+%
+\bibitem{myip}
+My IP Address - Shows IPv4 \& IPv6 / Blacklist IP Check - Hosting Info, https://myip.ms/, (2022.1.31参照)
+%
+\bibitem{abuse.ch}
+abuse.ch． https://abuse.ch/, (2022.1.31参照)
+%
+\end{thebibliography}
+
+\appendix
+
+\chapter{プログラム}
+
+\section*{app.js}
+\lstinputlisting[label=hello]{./program/app2.js}
+
+\vspace{0.2in}
+\section*{sensor.py}
+\lstinputlisting[label=hello]{./program/sensor2.py}
+
+\vspace{0.2in}
+\section*{index.html}
+\lstinputlisting[label=hello]{./program/index.html}
+
+\vspace{0.2in}
+\section*{main.js}
+\lstinputlisting[label=hello]{./program/main3.js}
+
+%\input{furoku}
+
+\end{document}
+
+

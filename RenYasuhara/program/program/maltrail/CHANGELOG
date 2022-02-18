@@ -1,0 +1,102 @@
+# Copyright (c) 2014-2021 Maltrail developers (https://github.com/stamparm/maltrail/)
+# See the file 'LICENSE' for copying permission
+
+#################################################################
+#                 Maltrail Changelog File                       #
+#################################################################
+
+[+] Added functionality
+[-] Deleted functionality
+[!] Bug fixing
+[=] Minor update or changed functionality
+
+#################################################################
+
+
+- Version 0.38 -> 0.39 (Upcoming release)
+
+[=] "potential directory traversal" heuristic is extended
+
+
+
+
+- Version 0.37 -> 0.38 (03 Oct 2021)
+
+[=] Multiple updates and optimizations for regular static trails and the whitelist
+
+
+
+- Version 0.36 -> 0.37 (02 Sep 2021)
+
+
+[=] Multiple updates and optimizations for regular static trails and the whitelist
+
+
+
+- Version 0.35 -> 0.36 (02 Aug 2021)
+
+[=] Multiple updates and optimizations for regular static trails and the whitelist
+
+
+
+- Version 0.34 -> 0.35 (04 Jul 2021)
+
+[+] Added the prototype of heur for potential web scanning attempts
+[=] Multiple updates and optimizations for regular static trails and the whitelist
+
+
+
+- Version 0.33 -> 0.34 (10 Jun 2021)
+
+[=] Multiple updates and optimizations for regular static trails and the whitelist
+
+
+
+- Version 0.32 -> 0.33 (10 Jun 2021)
+
+[=] Multiple updates and optimizations for regular static trails and the whitelist
+
+
+
+- Version 0.31 -> 0.32 (10 May 2021)
+
+[!] Fixed PR_END_OF_FILE_ERROR bug, when using HTTPS for Maltrail's server (Issue #16217)
+[!] Fixed bug with TLSv1_2_METHOD (Issue #16250)
+[+] Added displaying real IP behind Cloudflare's one (Issue #20)
+[=] Multiple updates and optimizations for regular static trails and the whitelist
+
+
+
+- Version 0.30 -> 0.31 (01 Apr 2021)
+
+[=] Multiple updates and optimizations for regular static trails and the whitelist
+
+
+
+- Version 0.29 -> 0.30 (01 Mar 2021)
+
+[=] Multiple updates and optimizations for regular static trails and the whitelist
+
+
+
+- Version 0.28 -> 0.29 (01 Feb 2021)
+
+[+] Two new UI features (hide threat and report false positive options)
+[+] Auto-refresh for Maltrail web-page (/?refresh=N, where N in seconds. Issue #624)
+[+] Maltrail demo pages are released: maltraildemo.github.io
+[=] Multiple updates and optimizations for regular static trails and the whitelist
+[=] Potential DNS changer heur is improved
+[+] Implemented colorized console output
+[=] Minor style revamp and improved look and feel on mobile phones
+[-] Memory check is removed
+[+] Added info for proper Maltrail citation (/CITATION.cff)
+[=] Added starting and ending times to console output
+
+
+
+- Version 0.27 -> 0.28 (01 Jan 2021)
+
+[+] Implementing support for LOGSTASH_SERVER (Logs in JSON format)
+[+] Implementing REMOTE_SEVERITY_REGEX (Issue #13251)
+[=] Sensor is able to get started without server (Issue #6020)
+[=] Multiple updates and optimizations for regular static trails and the whitelist

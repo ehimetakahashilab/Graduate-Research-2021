@@ -1,0 +1,68 @@
+body {
+	margin: 0;
+	overflow: hidden;
+	color: #FFF;
+}
+thead, tbody {
+	text-align: center;
+	display: block;
+}
+#infoTableBody {
+	overflow-y: scroll;
+}
+
+.button {
+	margin: 2px;
+	font-weight: bold;
+	font-size: 13px;
+	width: 150px;
+	height: 50px;
+	text-align: center;
+	background-color: transparent;
+	border: 2px solid #FFF;
+	color: #FFF;
+	
+}
+.button:hover {
+	background-color: rgba(255, 255, 255, .2);
+}
+
+div {
+	padding: 5px;
+}
+
+#canvasArea {
+	position: relative;
+	padding: 0;
+}
+
+#textArea {
+	position: absolute;
+	z-index: 1;
+}
+
+
+.datetime {
+	width: 200px;
+}
+.country {
+	width: 30px;
+}
+.s_addr {
+	width: 150px;
+}
+.d_addr {
+	width: 150px;
+}
+.protocol {
+	width: 70px;
+}
+.length {
+	width: 70px;
+}
+.s_port {
+	width: 90px;
+}
+.d_port {
+	width: 90px;
+}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="utf-8">
+	<title>パケット可視化システム</title>
+	<link rel="stylesheet" href="style.css">
+	<script src="js/jquery-3.1.1.min.js"></script>
+	<script src="js/three.min.js"></script>
+	<script src="js/OrbitControls.js"></script>
+	<script src="js/Detector.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="main3.js"></script>
+</head>
+<body>
+
+<!-- 可視化上に文字情報を載せるための領域 -->
+<div id="textArea">
+	<div id="buttonArea">
+		<input type="button" class="button" id="infoTableButton" value="パケット情報"/>
+	</div>
+
+	<div id="menuArea" style="display: none">
+		可視化モデル選択<br>
+		<input type="radio" name="model" value="1" checked="checked"/>モデル1
+		<input type="radio" name="model" value="2"/>モデル2
+		<input type="radio" name="model" value="3"/>モデル3<br><br>
+		色分け方法<br>
+		<input type="radio" name="color" value="1" checked="checked"/>異常の有無で色分け
+		<input type="radio" name="color" value="2"/>プロトコルで色分け
+		<input type="radio" name="color" value="3"/>モデル3
+	</div>
+
+	<div id="infoTableArea" style="display: none">
+		<input type="button" class="button" id="initTableButton" value="履歴のクリア"/>
+		<table id="infoTable">
+			<thead>
+				<tr>
+					<th class="datetime">取得日時</th>
+					<th class="country">国</th>
+					<th class="s_addr">送信元IPアドレス</th>
+					<th class="d_addr">宛先IPアドレス</th>
+					<th class="protocol">プロトコル</th>
+					<th class="length">パケット長</th>
+				</tr>
+			</thead>
+			<tbody id="infoTableBody"></tbody>
+		</table>
+	</div>
+</div>
+
+<!-- 可視化領域 -->
+<div id="canvasArea"></div>
+
+</body>
+</html>
