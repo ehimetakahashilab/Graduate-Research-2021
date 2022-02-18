@@ -1,0 +1,52 @@
+\contentsline {chapter}{\numberline {第1章}序論}{1}
+\contentsline {section}{\numberline {1.1}研究背景および目的・目標}{1}
+\contentsline {section}{\numberline {1.2}本論文の構成}{2}
+\contentsline {chapter}{\numberline {第2章}準備}{3}
+\contentsline {section}{\numberline {2.1}暗号化手法}{3}
+\contentsline {subsection}{\numberline {2.1.1}AES(Advanced Encryption Standard)}{3}
+\contentsline {subsection}{\numberline {2.1.2}バーナム暗号}{3}
+\contentsline {section}{\numberline {2.2}通信プロトコル}{4}
+\contentsline {subsection}{\numberline {2.2.1}TCP(Transmission Control Protocol)}{4}
+\contentsline {subsection}{\numberline {2.2.2}UDP(User Datagram Protocol)}{4}
+\contentsline {section}{\numberline {2.3}システム開発プロセス}{4}
+\contentsline {subsection}{\numberline {2.3.1}V字開発モデル}{4}
+\contentsline {subsection}{\numberline {2.3.2}UML(Unified Modeling Language)}{5}
+\contentsline {subsection}{\numberline {2.3.3}ユースケース図}{5}
+\contentsline {subsection}{\numberline {2.3.4}シーケンス図}{5}
+\contentsline {subsection}{\numberline {2.3.5}クラス図}{6}
+\contentsline {chapter}{\numberline {第3章}SAS-L2認証方法}{7}
+\contentsline {section}{\numberline {3.1}SAS-L2(SimpleAnd Secure password authentication protocol,Light processing version, type 2)の概要}{7}
+\contentsline {subsection}{\numberline {3.1.1}初期登録処理}{7}
+\contentsline {subsection}{\numberline {3.1.2}認証処理}{8}
+\contentsline {chapter}{\numberline {第4章}センシングデータ通信の暗号化}{11}
+\contentsline {section}{\numberline {4.1}SAS-L2に基づいたデータ通信の暗号化}{11}
+\contentsline {subsection}{\numberline {4.1.1}送信側のセンシングデータ暗号化}{11}
+\contentsline {subsection}{\numberline {4.1.2}受信側のセンシングデータの復号化}{12}
+\contentsline {subsection}{\numberline {4.1.3}提案手法の利点}{13}
+\contentsline {chapter}{\numberline {第5章}SAS-L2を用いたセキュアな組込みシステムの開発}{15}
+\contentsline {section}{\numberline {5.1}SAS-L2を用いたセキュアな組込みシステムの概要}{15}
+\contentsline {section}{\numberline {5.2}要件定義}{16}
+\contentsline {subsubsection}{機能要件}{16}
+\contentsline {subsubsection}{非機能要件}{17}
+\contentsline {chapter}{\numberline {第6章}SAS-L2を用いたセキュアな組込みシステムの設計}{18}
+\contentsline {section}{\numberline {6.1}基本設計}{18}
+\contentsline {section}{\numberline {6.2}役割分担}{22}
+\contentsline {section}{\numberline {6.3}スケジュール}{22}
+\contentsline {section}{\numberline {6.4}詳細設計}{24}
+\contentsline {subsection}{\numberline {6.4.1}データフォーマット}{28}
+\contentsline {section}{\numberline {6.5}テスト項目の作成}{29}
+\contentsline {subsection}{\numberline {6.5.1}単体テスト項目}{29}
+\contentsline {subsection}{\numberline {6.5.2}結合テスト項目}{30}
+\contentsline {subsection}{\numberline {6.5.3}総合テスト項目}{31}
+\contentsline {chapter}{\numberline {第7章}検証}{33}
+\contentsline {section}{\numberline {7.1}使用端末}{33}
+\contentsline {section}{\numberline {7.2}使用センサ}{33}
+\contentsline {section}{\numberline {7.3}開発環境}{33}
+\contentsline {section}{\numberline {7.4}テスト}{34}
+\contentsline {subsection}{\numberline {7.4.1}単体テスト}{34}
+\contentsline {subsection}{\numberline {7.4.2}結合テスト}{38}
+\contentsline {subsection}{\numberline {7.4.3}総合テスト}{41}
+\contentsline {section}{\numberline {7.5}考察}{47}
+\contentsline {chapter}{\numberline {第8章}あとがき}{49}
+\contentsline {chapter}{\numberline {謝辞}{}}{50}
+\contentsline {chapter}{参考文献}{51}

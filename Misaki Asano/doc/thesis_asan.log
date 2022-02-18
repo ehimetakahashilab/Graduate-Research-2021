@@ -1,0 +1,608 @@
+This is e-pTeX, Version 3.14159265-p3.8.1-180226-2.6 (utf8.euc) (TeX Live 2018) (preloaded format=platex 2018.12.4)  18 FEB 2022 21:39
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**thesis_asan.tex
+(./thesis_asan.tex
+pLaTeX2e <2018-12-01> (based on LaTeX2e <2018-04-01> patch level 5)
+(./thesis.cls
+Document Class: thesis 2003/03/04 v1.18 a pLaTeX class for the master thesises 
+and bachelor thesises in Ehime Univ.
+\c@@paper=\count83
+(/usr/local/texlive/2018/texmf-dist/tex/latex/base/fleqn.clo
+File: fleqn.clo 2016/12/29 v1.2a Standard LaTeX option (flush left equations)
+\mathindent=\dimen118
+Applying: [2015/01/01] Make \[ robust on input line 50.
+LaTeX Info: Redefining \[ on input line 51.
+Already applied: [0000/00/00] Make \[ robust on input line 62.
+Applying: [2015/01/01] Make \] robust on input line 74.
+LaTeX Info: Redefining \] on input line 75.
+Already applied: [0000/00/00] Make \] robust on input line 83.
+)
+\c@part=\count84
+\c@chapter=\count85
+\c@section=\count86
+\c@subsection=\count87
+\c@subsubsection=\count88
+\c@paragraph=\count89
+\c@subparagraph=\count90
+\c@figure=\count91
+\c@table=\count92
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\mycap@width=\dimen119
+\mycap@bodywidth=\dimen120
+\symmincho=\mathgroup4
+LaTeX Font Info:    Overwriting symbol font `mincho' in version `bold'
+(Font)                  JY1/mc/m/n --> JY1/gt/m/n on input line 977.
+\toclineskip=\dimen121
+\@lnumwidth=\dimen122
+\bibindent=\dimen123
+\heisei=\count93
+\@minsofar=\count94
+\@min=\count95
+\@cite@temp=\count96
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\@emptytoks=\toks15
+\symAMSa=\mathgroup5
+\symAMSb=\mathgroup6
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+))
+\c@definition=\count97
+\c@theorem=\count98
+\c@corollary=\count99
+\c@proposition=\count100
+\c@lemma=\count101
+\c@assumption=\count102
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2017/06/01 v1.1a Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks16
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2017/06/25 v1.2c Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: dvips.def on input line 99.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics-def/dvips.def
+File: dvips.def 2017/06/20 v3.1d Graphics/color driver for dvips
+))
+\Gin@req@height=\dimen124
+\Gin@req@width=\dimen125
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2017/09/02 v2.17a AMS math features
+\@mathmargin=\skip43
+
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2000/06/29 v2.01 AMS text
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks17
+\ex@=\dimen126
+))
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen127
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 2016/03/08 v2.02 operator names
+)
+\inf@bad=\count103
+LaTeX Info: Redefining \frac on input line 213.
+\uproot@=\count104
+\leftroot@=\count105
+LaTeX Info: Redefining \overline on input line 375.
+\classnum@=\count106
+\DOTSCASE@=\count107
+LaTeX Info: Redefining \ldots on input line 472.
+LaTeX Info: Redefining \dots on input line 475.
+LaTeX Info: Redefining \cdots on input line 596.
+\Mathstrutbox@=\box42
+\strutbox@=\box43
+\big@size=\dimen128
+LaTeX Font Info:    Redeclaring font encoding OML on input line 712.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 713.
+\macc@depth=\count108
+\c@MaxMatrixCols=\count109
+\dotsspace@=\muskip10
+\c@parentequation=\count110
+\dspbrk@lvl=\count111
+\tag@help=\toks18
+\row@=\count112
+\column@=\count113
+\maxfields@=\count114
+\andhelp@=\toks19
+\eqnshift@=\dimen129
+\alignsep@=\dimen130
+\tagshift@=\dimen131
+\tagwidth@=\dimen132
+\totwidth@=\dimen133
+\lineht@=\dimen134
+\@envbody=\toks20
+\multlinegap=\skip44
+\multlinetaggap=\skip45
+\mathdisplay@stack=\toks21
+LaTeX Info: Redefining \[ on input line 2817.
+LaTeX Info: Redefining \] on input line 2818.
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/tools/enumerate.sty
+Package: enumerate 2015/07/23 v3.00 enumerate extensions (DPC)
+\@enLab=\toks22
+))
+(/usr/local/texlive/2018/texmf-dist/tex/latex/txfonts/txfonts.sty
+Package: txfonts 2008/01/22 v3.2.1
+LaTeX Font Info:    Redeclaring symbol font `operators' on input line 21.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
+(Font)                  OT1/cmr/m/n --> OT1/txr/m/n on input line 21.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/txr/m/n on input line 21.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
+(Font)                  OT1/txr/m/n --> OT1/txr/bx/n on input line 22.
+\symitalic=\mathgroup7
+LaTeX Font Info:    Overwriting symbol font `italic' in version `bold'
+(Font)                  OT1/txr/m/it --> OT1/txr/bx/it on input line 26.
+LaTeX Font Info:    Redeclaring math alphabet \mathrm on input line 28.
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 29.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
+(Font)                  OT1/cmr/bx/n --> OT1/txr/bx/n on input line 29.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/txr/bx/n on input line 29.
+LaTeX Font Info:    Redeclaring math alphabet \mathit on input line 30.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
+(Font)                  OT1/cmr/m/it --> OT1/txr/m/it on input line 30.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
+(Font)                  OT1/cmr/bx/it --> OT1/txr/m/it on input line 30.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
+(Font)                  OT1/txr/m/it --> OT1/txr/bx/it on input line 31.
+LaTeX Font Info:    Redeclaring math alphabet \mathsf on input line 40.
+LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
+(Font)                  OT1/cmss/m/n --> OT1/txss/m/n on input line 40.
+LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
+(Font)                  OT1/cmss/bx/n --> OT1/txss/m/n on input line 40.
+LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
+(Font)                  OT1/txss/m/n --> OT1/txss/b/n on input line 41.
+LaTeX Font Info:    Redeclaring math alphabet \mathtt on input line 50.
+LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
+(Font)                  OT1/cmtt/m/n --> OT1/txtt/m/n on input line 50.
+LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
+(Font)                  OT1/cmtt/m/n --> OT1/txtt/m/n on input line 50.
+LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
+(Font)                  OT1/txtt/m/n --> OT1/txtt/b/n on input line 51.
+LaTeX Font Info:    Redeclaring symbol font `letters' on input line 58.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `normal'
+(Font)                  OML/cmm/m/it --> OML/txmi/m/it on input line 58.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `bold'
+(Font)                  OML/cmm/b/it --> OML/txmi/m/it on input line 58.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `bold'
+(Font)                  OML/txmi/m/it --> OML/txmi/bx/it on input line 59.
+\symlettersA=\mathgroup8
+LaTeX Font Info:    Overwriting symbol font `lettersA' in version `bold'
+(Font)                  U/txmia/m/it --> U/txmia/bx/it on input line 67.
+LaTeX Font Info:    Redeclaring math alphabet \mathfrak on input line 70.
+LaTeX Font Info:    Redeclaring symbol font `symbols' on input line 77.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `normal'
+(Font)                  OMS/cmsy/m/n --> OMS/txsy/m/n on input line 77.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `bold'
+(Font)                  OMS/cmsy/b/n --> OMS/txsy/m/n on input line 77.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `bold'
+(Font)                  OMS/txsy/m/n --> OMS/txsy/bx/n on input line 78.
+LaTeX Font Info:    Redeclaring symbol font `AMSa' on input line 93.
+LaTeX Font Info:    Overwriting symbol font `AMSa' in version `normal'
+(Font)                  U/msa/m/n --> U/txsya/m/n on input line 93.
+LaTeX Font Info:    Overwriting symbol font `AMSa' in version `bold'
+(Font)                  U/msa/m/n --> U/txsya/m/n on input line 93.
+LaTeX Font Info:    Overwriting symbol font `AMSa' in version `bold'
+(Font)                  U/txsya/m/n --> U/txsya/bx/n on input line 94.
+LaTeX Font Info:    Redeclaring symbol font `AMSb' on input line 102.
+LaTeX Font Info:    Overwriting symbol font `AMSb' in version `normal'
+(Font)                  U/msb/m/n --> U/txsyb/m/n on input line 102.
+LaTeX Font Info:    Overwriting symbol font `AMSb' in version `bold'
+(Font)                  U/msb/m/n --> U/txsyb/m/n on input line 102.
+LaTeX Font Info:    Overwriting symbol font `AMSb' in version `bold'
+(Font)                  U/txsyb/m/n --> U/txsyb/bx/n on input line 103.
+\symsymbolsC=\mathgroup9
+LaTeX Font Info:    Overwriting symbol font `symbolsC' in version `bold'
+(Font)                  U/txsyc/m/n --> U/txsyc/bx/n on input line 113.
+LaTeX Font Info:    Redeclaring symbol font `largesymbols' on input line 120.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `normal'
+(Font)                  OMX/cmex/m/n --> OMX/txex/m/n on input line 120.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `bold'
+(Font)                  OMX/cmex/m/n --> OMX/txex/m/n on input line 120.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `bold'
+(Font)                  OMX/txex/m/n --> OMX/txex/bx/n on input line 121.
+\symlargesymbolsA=\mathgroup10
+LaTeX Font Info:    Overwriting symbol font `largesymbolsA' in version `bold'
+(Font)                  U/txexa/m/n --> U/txexa/bx/n on input line 129.
+LaTeX Info: Redefining \not on input line 1043.
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip11
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/algorithms/algorithm.sty
+Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating enviro
+nment
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count115
+\float@exts=\toks23
+\float@box=\box44
+\@float@everytoks=\toks24
+\@floatcapt=\box45
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
+)
+\@float@every@algorithm=\toks25
+\c@algorithm=\count116
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/algorithms/algorithmic.sty
+Package: algorithmic 2009/08/24 v0.1 Document Style `algorithmic'
+\c@ALC@unique=\count117
+\c@ALC@line=\count118
+\c@ALC@rem=\count119
+\c@ALC@depth=\count120
+\ALC@tlm=\skip46
+\algorithmicindent=\skip47
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics/color.sty
+Package: color 2016/07/10 v1.1e Standard LaTeX Color (DPC)
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package color Info: Driver file: dvipdfmx.def on input line 147.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics-def/dvipdfmx.def
+File: dvipdfmx.def 2017/06/24 v5.0g Graphics/color driver for dvipdfmx
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/graphics/dvipsnam.def
+File: dvipsnam.def 2016/06/17 v3.0m Driver-dependent file (DPC,SPQR)
+))
+(/usr/local/texlive/2018/texmf-dist/tex/latex/multirow/multirow.sty
+Package: multirow 2018/08/03 v2.3 Span multiple rows of a table
+\multirow@colwidth=\skip48
+\multirow@cntb=\count121
+\multirow@dima=\skip49
+\bigstrutjot=\dimen135
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/subfigure/subfigure.sty
+Package: subfigure 2002/03/15 v2.1.5 subfigure package
+\subfigtopskip=\skip50
+\subfigcapskip=\skip51
+\subfigcaptopadj=\dimen136
+\subfigbottomskip=\skip52
+\subfigcapmargin=\dimen137
+\subfiglabelskip=\skip53
+\c@subfigure=\count122
+\c@lofdepth=\count123
+\c@subtable=\count124
+\c@lotdepth=\count125
+
+****************************************
+* Local config file subfigure.cfg used *
+****************************************
+(/usr/local/texlive/2018/texmf-dist/tex/latex/subfigure/subfigure.cfg)
+\subfig@top=\skip54
+\subfig@bottom=\skip55
+)
+(/usr/local/texlive/2018/texmf-dist/tex/latex/tools/indentfirst.sty
+Package: indentfirst 1995/11/23 v1.03 Indent first paragraph (DPC)
+)
+(./thesis_asan.aux)
+\openout1 = `thesis_asan.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/txmi/m/it on input line 13.
+LaTeX Font Info:    Try loading font information for OML+txmi on input line 13.
+
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/txfonts/omltxmi.fd
+File: omltxmi.fd 2000/12/15 v3.1
+)
+LaTeX Font Info:    ... okay on input line 13.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 13.
+LaTeX Font Info:    ... okay on input line 13.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 13.
+LaTeX Font Info:    ... okay on input line 13.
+LaTeX Font Info:    Checking defaults for OMS/txsy/m/n on input line 13.
+LaTeX Font Info:    Try loading font information for OMS+txsy on input line 13.
+
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/txfonts/omstxsy.fd
+File: omstxsy.fd 2000/12/15 v3.1
+)
+LaTeX Font Info:    ... okay on input line 13.
+LaTeX Font Info:    Checking defaults for OMX/txex/m/n on input line 13.
+LaTeX Font Info:    Try loading font information for OMX+txex on input line 13.
+
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/txfonts/omxtxex.fd
+File: omxtxex.fd 2000/12/15 v3.1
+)
+LaTeX Font Info:    ... okay on input line 13.
+LaTeX Font Info:    Checking defaults for U/txexa/m/n on input line 13.
+LaTeX Font Info:    Try loading font information for U+txexa on input line 13.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/txfonts/utxexa.fd
+File: utxexa.fd 2000/12/15 v3.1
+)
+LaTeX Font Info:    ... okay on input line 13.
+LaTeX Font Info:    Checking defaults for JY1/mc/m/n on input line 13.
+LaTeX Font Info:    ... okay on input line 13.
+LaTeX Font Info:    Checking defaults for JT1/mc/m/n on input line 13.
+LaTeX Font Info:    ... okay on input line 13.
+
+(I search kanjifont definition file: . . ) (I search font definition file: . .
+. . . . . )
+LaTeX Font Info:    Try loading font information for OT1+txr on input line 13.
+ (/usr/local/texlive/2018/texmf-dist/tex/latex/txfonts/ot1txr.fd
+File: ot1txr.fd 2000/12/15 v3.1
+)
+LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
+(Font)              scaled to size 19.9311pt on input line 16.
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <20.74> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 16.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <20.74> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 16.
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 19.9311pt on input line 16.
+
+(./thesis_asan.toc
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <10.95> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 1.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <10.95> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 1.
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 10.52292pt on input line 1.
+LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
+(Font)              scaled to size 7.68799pt on input line 2.
+LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
+(Font)              scaled to size 5.76599pt on input line 2.
+LaTeX Font Info:    Try loading font information for U+txsya on input line 2.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/txfonts/utxsya.fd
+File: utxsya.fd 2000/12/15 v3.1
+)
+LaTeX Font Info:    Try loading font information for U+txsyb on input line 2.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/txfonts/utxsyb.fd
+File: utxsyb.fd 2000/12/15 v3.1
+)
+LaTeX Font Info:    Try loading font information for U+txmia on input line 2.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/txfonts/utxmia.fd
+File: utxmia.fd 2000/12/15 v3.1
+)
+LaTeX Font Info:    Try loading font information for U+txsyc on input line 2.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/txfonts/utxsyc.fd
+File: utxsyc.fd 2000/12/15 v3.1
+)
+Overfull \hbox (5.57167pt too wide) in paragraph at lines 18--18
+ [][] []\OT1/txr/m/n/10.95 SAS-L2(SimpleAnd Se-cure pass-word au-then-ti-ca-tio
+n pro-to-col,Light pro-cess-ing ver- 
+ []
+
+[1
+
+
+])
+\tf@toc=\write3
+\openout3 = `thesis_asan.toc'.
+
+ [2]
+第 1 章
+(./1.tex
+LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
+(Font)              scaled to size 13.83836pt on input line 4.
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <14.4> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 4.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <14.4> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 4.
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 13.83836pt on input line 4.
+ [1
+
+]) [2]
+第 2 章
+(./2.tex
+LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
+(Font)              scaled to size 11.53198pt on input line 7.
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <12> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 7.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <12> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 7.
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 11.53198pt on input line 7.
+ [3
+
+]
+File: vmodel.eps Graphic file (type eps)
+<vmodel.eps>
+ [4]) [5] [6]
+第 3 章
+(./8.tex
+Overfull \hbox (15.50337pt too wide) in paragraph at lines 3--3
+[]\OT1/txr/bx/n/14.4 SAS-L2(SimpleAnd Se-cure pass-word au-then-ti-ca-tion pro-
+to-col,Light
+ []
+
+File: sas_l2_syoki.eps Graphic file (type eps)
+<sas_l2_syoki.eps>
+[7
+
+]
+File: sas_l2.eps Graphic file (type eps)
+<sas_l2.eps>
+ [8] [9]) [10]
+第 4 章
+(./3.tex
+LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
+(Font)              scaled to size 8.64899pt on input line 30.
+ [11
+
+] [12]) [13] [14]
+第 5 章
+(./4.tex
+File: gaiyo.png Graphic file (type bmp)
+<gaiyo.png>
+ [15
+
+] [16]) [17]
+第 6 章
+(./5.tex
+File: usecase.png Graphic file (type bmp)
+<usecase.png>
+ [18
+
+]
+File: kihon_sequence.png Graphic file (type bmp)
+<kihon_sequence.png>
+ [19] [20]
+File: kihon_class.png Graphic file (type bmp)
+<kihon_class.png>
+ [21]
+File: ganto.png Graphic file (type bmp)
+<ganto.png>
+ [22] [23]
+File: time_sequence.png Graphic file (type bmp)
+<time_sequence.png>
+File: ninsyo_sequence.png Graphic file (type bmp)
+<ninsyo_sequence.png>
+ [24] [25]
+File: sensor_sequence.png Graphic file (type bmp)
+<sensor_sequence.png>
+ [26]
+File: ango_sequence.png Graphic file (type bmp)
+<ango_sequence.png>
+ [27]
+File: format.png Graphic file (type bmp)
+<format.png>
+ [28] [29] [30])
+[31] [32]
+第 7 章
+(./6.tex [33
+
+] [34] [35]
+File: alpha.png Graphic file (type bmp)
+<alpha.png>
+File: beta_An.png Graphic file (type bmp)
+<beta_An.png>
+File: beta_Mn.png Graphic file (type bmp)
+<beta_Mn.png>
+File: beta_Am.png Graphic file (type bmp)
+<beta_Am.png>
+File: beta.png Graphic file (type bmp)
+<beta.png>
+File: ninsyo_Mm.png Graphic file (type bmp)
+<ninsyo_Mm.png>
+ [36]
+File: SD.png Graphic file (type bmp)
+<SD.png>
+File: gamma.png Graphic file (type bmp)
+<gamma.png>
+
+Overfull \hbox (2.08049pt too wide) in paragraph at lines 265--277
+[][]$[]$[] []$[]$[] 
+ []
+
+[37]
+File: ango_alpha.png Graphic file (type bmp)
+<ango_alpha.png>
+File: ango_Al.png Graphic file (type bmp)
+<ango_Al.png>
+File: ango_Mm.png Graphic file (type bmp)
+<ango_Mm.png>
+ [38]
+File: ninsyo_server_alpha.png Graphic file (type bmp)
+<ninsyo_server_alpha.png>
+File: ninsyo_uv_alpha.png Graphic file (type bmp)
+<ninsyo_uv_alpha.png>
+File: ninsyo_uv_beta.png Graphic file (type bmp)
+<ninsyo_uv_beta.png>
+File: ninsyo_server_beta.png Graphic file (type bmp)
+<ninsyo_server_beta.png>
+ [39]
+File: ninsyo_uv_gamma.png Graphic file (type bmp)
+<ninsyo_uv_gamma.png>
+File: ninsyo_server_gamma.png Graphic file (type bmp)
+<ninsyo_server_gamma.png>
+File: ango_uv_sd.png Graphic file (type bmp)
+<ango_uv_sd.png>
+File: ango_server_sd.png Graphic file (type bmp)
+<ango_server_sd.png>
+ [40]
+File: ango_server_alpha.png Graphic file (type bmp)
+<ango_server_alpha.png>
+File: ango_uv_alpha.png Graphic file (type bmp)
+<ango_uv_alpha.png>
+ [41] [42]
+File: sogo_ninsyo_server_1.png Graphic file (type bmp)
+<sogo_ninsyo_server_1.png>
+File: sogo_ninsyo_uv.png Graphic file (type bmp)
+<sogo_ninsyo_uv.png>
+ [43]
+File: pc_uv.png Graphic file (type bmp)
+<pc_uv.png>
+File: pc_mcp.png Graphic file (type bmp)
+<pc_mcp.png>
+File: pc_hih.png Graphic file (type bmp)
+<pc_hih.png>
+ [44]
+File: db_uv.png Graphic file (type bmp)
+<db_uv.png>
+File: db_hih.png Graphic file (type bmp)
+<db_hih.png>
+File: db_mcp.png Graphic file (type bmp)
+<db_mcp.png>
+ [45] [46] [47]) [48]
+第 8 章
+(./7.tex) [49
+
+] [50
+
+] (I search kanjifont definition file: . . )
+(I search font definition file: . . . . . . . )
+LaTeX Font Info:    Try loading font information for OT1+txtt on input line 64.
+
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/txfonts/ot1txtt.fd
+File: ot1txtt.fd 2000/12/15 v3.1
+)
+Underfull \hbox (badness 7030) in paragraph at lines 71--74
+[] \JY1/mc/m/n/10.95 “ 最強の暗号 ？ バ ーナム暗号\OT1/txr/m/n/10.95 ".kakke18
+'s blog.2019-02-22. $\OT1/txtt/m/n/10.95 https : / / kakke18 .
+ []
+
+[51
+
+] (./thesis_asan.aux) ) 
+Here is how much of TeX's memory you used:
+ 3156 strings out of 493249
+ 40614 string characters out of 6144415
+ 129429 words of memory out of 5000000
+ 6941 multiletter control sequences out of 15000+600000
+ 25388 words of font info for 90 fonts, out of 8000000 for 9000
+ 929 hyphenation exceptions out of 8191
+ 34i,16n,29p,539b,428s stack positions out of 5000i,500n,10000p,200000b,80000s
+
+Output written on thesis_asan.dvi (53 pages, 143188 bytes).
