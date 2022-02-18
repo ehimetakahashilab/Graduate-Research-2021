@@ -11,6 +11,7 @@ data_out32:データ送信モジュール
 ram:メモリ
   メモリに関してはライブラリにあるものを使用したため、ram.vとram_bb.vをダウンロードしても動作しないかもしれないので、その場合はQuartus Primeのライブラリから選び生成する。
 SAS-L2_client:SAS認証回路
+  ram.mif:メモリを初期化するためのファイル
 SAS-L2_server:サーバ側の処理
   SASL2.qsys:NIOSⅡのロジック回路
   SASL2.sopcinfo:サーバ側の処理を行うハードウェアの情報
