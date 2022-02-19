@@ -1,0 +1,1499 @@
+\documentclass{thesis}
+
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{ascmac}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage{listings,jvlisting}
+
+\renewcommand{\lstlistingname}{リスト}
+\lstset{
+  language=C,%
+  basicstyle=\footnotesize,%
+  commentstyle=\textit,%
+  classoffset=1,%
+  keywordstyle=\bfseries,%
+  frame=tRBl,framesep=5pt,%
+  showstringspaces=false,%
+  breaklines=true,%
+  numbers=left,stepnumber=1,numberstyle=\footnotesize%
+}%
+
+\begin{document}
+\tableofcontents
+
+\chapter{序論}
+\quad 近年、IoT(Internet of Things)の技術が発展し、家電や自動車、産業、医療など、分野を問わずIoT機器の導入が進んでいる。IoT機器には、Linux OSを搭載したボードコンピュータや、IoTエッジデバイスのようなセンサやRFIDタグなどの組込み機器が存在する。IoT機器で取得した情報はインターネットを介して収集・分析され、用途によっては分析結果によりIoT機器の制御が行われる。
+
+しかし、IoT機器が社会に普及する一方で、IoT機器の脆弱性を狙ったサイバー攻撃の脅威が増大しており、自動車、重要インフラ、医療などの場面において、セキュリティ対策が必須条件となっている。特にセンサ情報がプライバシーや非公開情報である場合には、認証や暗号通信などIoT機器の機密性や情報の完全性の確保を行うことが重要である。一般的にIoT機器は低消費電力で情報を通信できるように設計されているが、PCに比べると処理能力は低い。そのためIoT機器のための軽量な認証方式が検討されている。
+
+本研究では、SAS(Simple And Secure)ワンタイムパスワード認証方式について検討する。SASにはSAS-2やSAS-3など様々な方式が存在するが、SAS-L2(Simple And Secure password authentication protocol, Light processing version, type 2)はIoT機器で利用可能な軽量な認証方式として提案された。SAS-L2はSAS-2 と比較し、被認証側の演算負荷が削減されて
+いる。そのため、処理能力の低いIoT機器とそれらの機器からの情報を集約する装置の間で、ほぼ処理負荷なしに暗号通信における鍵配送が可能である。しかし、SAS-L2のIoT機器においての実装は検討されていない。
+
+本研究では、TWELITEと呼ばれる無線機能を持ったマイコンモジュールにおいて、SAS-L2の有効性を検証することを研究目的とする。TWELITEは消費電力が小さく、電池での長時間稼働が可能といった特徴を持ち、C言語を使った組込みプログラムを実装することが可能である。本研究では、TWELITEでSAS-L2を実装し、SAS-L2による認証が実装できることを確認した。また、認証のための計算時間の評価を行い、TWELITEにおけるSAS-L2の有効性を示すことができた。
+
+\chapter{ハッシュ関数}
+\quad ワンタイムパスワード認証方式SAS-2やSAS-L2では一方向性変換関数にハッシュ関数が利用される。ハッシュ関数とは、任意のデータから規則性のない固定長のビット列を生成する関数のことである。ハッシュ関数は以下の3つの性質により、現在のセキュリティ技術などに利用されている\cite{one}。
+
+\begin{itemize}
+\item 入力するデータが少しでも違うと全く異なるハッシュ値を生成する
+
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.4]{./hash1.png}
+ \caption{入力例}
+\end{figure}
+
+\item 入力するデータが同じであれば、必ず同じハッシュ値を生成する
+
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.57]{./hash2.png}
+ \caption{入力例}
+\end{figure}
+
+\item 任意のハッシュ値を生成するのが困難である
+\end{itemize}
+
+ハッシュ関数にはMD5やSHA-1など様々な種類があるが、本研究ではSHA256を使用する。その理由やそれぞれのハッシュ関数について説明する。
+
+\section{MD5(Message Digest 5)}
+MD5はMessage Digest 5の略で1991年にロナルド・リベストによって開発されたハッシュ関数の一つである\cite{two}。入力されたデータから128bitのハッシュ値を生成する。図2.3にMD5の計算例を示す。
+
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.4]{./md5.png}
+ \caption{MD5の計算例}
+\end{figure}
+
+しかし、MD5は生成されたハッシュ値から理論的に元のデータを求めることができたという報告がされており、ハッシュ関数の政府推奨暗号リストにはMD5は含まれていない。そのため、現在ではセキュリティ用途でMD5を使用するのは安全ではないと言われている。
+
+\section{SHA-1(Secure Hash Algorithm 1)}
+SHA-1はSecure Hash Algorithm 1の略で1995年にNIST(アメリカ国立標準技術研究所)によって考案されたハッシュ関数の一つである\cite{three}。入力データを一定の手順で計算を行い、入力値のデータの長さに関わらず160bitのハッシュ値を生成する。図2.4にSHA-1の計算例を示す。
+
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.4]{./sha-1.png}
+ \caption{SHA-1の例}
+\end{figure}
+
+SHA-1は多くのアプリケーションやプロトコルに採用されていたが、2005年頃からSHA-1に対する効率的に攻撃する手法がいくつか発見された。そのため、2013年11月にはマイクロソフト、2017年までにMicrosoft WindowsのTLS/SSLが、2014年9月にはGoogle、2017年までにGoogle Chromeにおいて、それぞれSHA-1による証明書を受け入れないようにすることが表明され、セキュリティ用途でSHA-1が使われる機会はなくなった。
+
+\section{SHA-2(Secure Hash Algorighm 2)}
+SHA-2はSecure Hash Algorithm 2の略で2001年にNIST(アメリカ国立標準技術研究所)によって考案され、SHA-1から多くの改良が加えられたハッシュ関数の一つである\cite{four}。入力データを一定の手順で計算を行い、入力値のデータの長さに関わらず決まった長さの文字列を出力する。SHA-2の特徴としては、SHA-224、SHA-256、SHA-384、SHA-512、SHA-512/224、SHA-512/256の6つのバリエーションを持ち、ハッシュ値の長さは224、256、384、512bitのいずれかである。本研究では、SHA-2の中のSHA-256を使用する。図2.5にSHA-2の中のSHA-256、SHA-512の計算例を示す。
+
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.45]{./sha-2.png}
+ \caption{SHA-256、SHA-512の計算例}
+\end{figure}
+
+\subsection{SHA-256(Secure Hash Algorithm 256bit)}
+本研究で使用するハッシュ関数SHA-256のアルゴリズムについて説明する\cite{five}。図2.6にSHA-256の処理手順を示す。
+
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.45]{./sha256.png}
+ \caption{SHA-256の処理手順\cite{six}}
+\end{figure}
+
+説明に必要な計算の変数について表2.1、記号について表2.2、関数について表2.3に示す。
+
+\begin{table}[H]
+\centering
+\caption{計算に必要な変数}
+\begin{tabular}{|l|l|} \hline
+\textbf{変数} & \textbf{概要} \\ \hline
+$a,b,c,d,e,f,g,h$ & 32bitの変数で、ハッシュ値を求める時に使用 \\ \hline
+$N$ & パディングされたメッセージのブロック数 \\ \hline
+$H^{(i)}$ & $i$番目のハッシュ値 \\ \hline
+$H_{j}^{(i)}$ & $i$番目のハッシュ値の$j$番目のワード \\ \hline
+$M^{(i)}$ & $i$番目のメッセージブロック \\ \hline
+$M_{j}^{(i)}$ & $i$番目のメッセージブロックの$j$番目のワード \\ \hline
+$K_t$ & ハッシュ計算で使われる固定値で、SHA256は64個ある \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{計算に必要な記号}
+\begin{tabular}{|l|l|} \hline
+\textbf{演算子} & \textbf{概要} \\ \hline
+$\bigwedge$ & AND演算子 \\ \hline
+$\bigvee$ & OR演算子 \\ \hline
+$\bigoplus$ & XOR演算子 \\ \hline
+$\neg$ & NOT演算子 \\ \hline
+$+$ & 加算 \\ \hline
+$\parallel$ & 連結 \\ \hline 
+$\ll$ & 左ビットシフトで、$x\ll nでxの値を左へnビットシフトする$ \\ \hline
+$\gg$ & 右ビットシフトで、$x\gg nでxの値を右へnビットシフトする$ \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{計算に必要な関数}
+\begin{tabular}{|l|l|} \hline
+\textbf{関数} & \textbf{概要} \\ \hline
+$ROTR^n(x)$ & 
+\begin{tabular}{l}
+右にnビット巡回する操作関数 \\ SHA256では、$0 \leq n < 32、ROTR^n(x) = (x \gg n) \bigvee (x \ll (32-n))$
+\end{tabular} \\ \hline
+$SHR^n(x)$ & 
+\begin{tabular}{l}
+右にnビット巡回する操作関数 \\ SHA256では、$0 \leq n < 32、SHR^n(x) = x \gg n$
+\end{tabular} \\ \hline
+$Ch(x, y, z)$ & $(x \bigwedge y) \bigoplus (\neg x \bigwedge z)$ \\ \hline
+$Maj(x, y, z)$ & $(x \bigwedge y) \bigoplus (x \bigwedge z) \bigoplus (y \bigwedge z)$  \\ \hline
+$\sum\nolimits_0^{\{256\}}(x)$ & $ROTR^2(x) \bigoplus ROTR^{13}(x) \bigoplus ROTR^{22}(x)$ \\ \hline
+$\sum\nolimits_1^{\{256\}}(x)$ & $ROTR^6(x) \bigoplus ROTR^{11}(x) \bigoplus ROTR^{25}(x)$ \\ \hline
+$\sigma_0^{\{256\}}(x)$ & $ROTR^7(x) \bigoplus ROTR^{18}(x) \bigoplus SHR^{3}(x)$ \\ \hline
+$\sigma_1^{\{256\}}(x)$ & $ROTR^{17}(x) \bigoplus ROTR^{19}(x) \bigoplus SHR^{10}(x)$ \\ \hline
+\end{tabular}
+\end{table}
+
+次にハッシュ値を得るための計算について説明する。
+
+\begin{enumerate}
+\item 平文(16進数)を2進数に変換 \\
+例えば、$a$であれば16進数61、2進数110001に変換される。
+\item パディング \\
+パディングと呼ばれる空埋め処理を行う。1ブロックのサイズが512bit(64byte)のため、それ以下であれば512bitの倍数になるように空の部分を埋める。\\
+ただし、ただ0だけで埋めるなどでは不十分であり、空の部分を埋める際はもとのブロック長を末端に記録することで同じメッセージブロックが生まれないようにする。
+\item ブロックをメッセージブロックに分割 \\
+パディングされたメッセージは、512bit単位のブロックに分割される。
+\item 初期値を設定 \\
+初期値を設定する。SHA-256では以下のように初期値が定義されている。
+\begin{eqnarray*}
+H_0^{(0)} &=& 6a09e667 \\
+H_1^{(0)} &=& bb67ae85 \\
+H_2^{(0)} &=& 3c6ef372 \\
+H_3^{(0)} &=& a54ff53a \\
+H_4^{(0)} &=& 510e527f \\
+H_5^{(0)} &=& 9b05688c \\
+H_6^{(0)} &=& 1f83d9ab \\
+H_7^{(0)} &=& 5be0cd19
+\end{eqnarray*}
+
+\item ハッシュ値計算を行う。\\
+分割したメッセージブロックに対して以下の計算を行う。
+\begin{equation*}
+W_t = 
+\begin{cases}
+M_t^{(i)} & 0 \leq t \leq 15 \\
+\sigma_1^{\{256\}}(W_{t-2})+W_{t-7}+\sigma_0^{\{256\}}(W_{t-15})+W_{t-16} & 16 \leq t \leq 63
+\end{cases}
+\end{equation*}
+次に$(i−1)$番目のハッシュ値で$a,b,c,d,e,f,g,h$を初期化する
+\begin{eqnarray*}
+a_0 &=& H_0^{(i-1)} \\
+b_0 &=& H_1^{(i-1)} \\
+c_0 &=& H_2^{(i-1)} \\
+d_0 &=& H_3^{(i-1)} \\
+e_0 &=& H_4^{(i-1)} \\
+f_0 &=& H_5^{(i-1)} \\
+g_0 &=& H_6^{(i-1)} \\
+h_0 &=& H_7^{(i-1)}
+\end{eqnarray*}
+次に$0 \leq t \leq 63$に対して以下の計算を繰り返す
+\begin{eqnarray*}
+T_1 &=& h + \sum\nolimits_1^{\{256\}}(e_t) + Ch(e_t, f_t, g_t) + K_t^{\{256\}} + W_t \\
+T_2 &=& \sum\nolimits_0^{\{256\}}(a_t) + Maj(a_t, b_t, c_t) \\
+h_{t+1} &=& g_t \\
+g_{t+1} &=& f_t \\
+f_{t+1} &=& e_t \\
+e_{t+1} &=& d_t + T_1 \\
+d_{t+1} &=& c_t \\
+c_{t+1} &=& b_t \\
+b_{t+1} &=& a_t \\
+a_{t+1} &=& T_1 + T_2 
+\end{eqnarray*}
+
+ここでの$K_t$は次のように定義されている。
+\begin{align*}
+K_0&=&428a2f98, K_1&=&71374491, K_2&=&b5c0fbcf, K_3&=&e9b5dba5, \\
+K_4&=&3956c25b, K_5&=&59f111f1, K_6&=&923f82a4, K_7&=&ab1c5ed5, \\
+K_8&=&d807aa98, K_9&=&12835b01, K_{10}&=&243185be, K_{11}&=&550c7dc3, \\
+K_{12}&=&72be5d74, K_{13}&=&80deb1fe, K_{14}&=&9bdc06a7, K_{15}&=&c19bf174, \\
+K_{16}&=&e49b69c1, K_{17}&=&efbe4786, K_{18}&=&0fc19dc6, K_{19}&=&240ca1cc, \\
+K_{20}&=&2de92c6f, K_{21}&=&4a7484aa, K_{22}&=&5cb0a9dc, K_{23}&=&76f988da, \\
+K_{24}&=&983e5152, K_{25}&=&a831c66d, K_{26}&=&b00327c8, K_{27}&=&bf597fc7, \\
+K_{28}&=&c6e00bf3, K_{29}&=&d5a79147, K_{30}&=&06ca6351, K_{31}&=&14292967, \\
+K_{32}&=&27b70a85, K_{33}&=&2e1b2138, K_{34}&=&4d2c6dfc, K_{35}&=&53380d13, \\
+K_{36}&=&650a7354, K_{37}&=&766a0abb, K_{38}&=&81c2c92e, K_{39}&=&92722c85, \\
+K_{40}&=&a2bfe8a1, K_{41}&=&a81a664b, K_{42}&=&c24b8b70, K_{43}&=&c76c51a3, \\
+K_{44}&=&d192e819, K_{45}&=&d6990624, K_{46}&=&f40e3585, K_{47}&=&106aa070, \\
+K_{48}&=&19a4c116, K_{49}&=&1e376c08, K_{50}&=&2748774c, K_{51}&=&34b0bcb5, \\
+K_{52}&=&391c0cb3, K_{53}&=&4ed8aa4a, K_{54}&=&5b9cca4f, K_{55}&=&682e6ff3, \\
+K_{56}&=&748f82ee, K_{57}&=&78a5636f, K_{58}&=&84c87814, K_{59}&=&8cc70208, \\
+K_{60}&=&90befffa, K_{61}&=&a4506ceb, K_{62}&=&bef9a3f7, K_{63}&=&c67178f2
+\end{align*}
+
+最後に、$i$番目の中間ハッシュ値を
+\begin{eqnarray*}
+H_0^{(i)} &=& H_0^{(i-1)} + a_{64} \\
+H_1^{(i)} &=& H_1^{(i-1)} + b_{64} \\
+H_2^{(i)} &=& H_2^{(i-1)} + c_{64} \\
+H_3^{(i)} &=& H_3^{(i-1)} + d_{64} \\
+H_4^{(i)} &=& H_4^{(i-1)} + e_{64} \\
+H_5^{(i)} &=& H_5^{(i-1)} + f_{64} \\
+H_6^{(i)} &=& H_6^{(i-1)} + g_{64} \\
+H_7^{(i)} &=& H_7^{(i-1)} + h_{64}
+\end{eqnarray*}
+で計算する。これをメッセージブロック数$N$回文繰り返した最終的な256bitの値
+\begin{equation*}
+H^{(N)} = H_0^{N} \parallel H_1^{N} \parallel H_2^{N} \parallel H_3^{N} \parallel H_4^{N} \parallel H_5^{N} \parallel H_6^{N} \parallel H_7^{N}
+\end{equation*}
+が入力されたメッセージのハッシュ値となる。
+\end{enumerate}
+
+\section{ハッシュ衝突}
+ハッシュ値のアルゴリズムを考える上で重要なのが「ハッシュ衝突」と呼ばれる現象である。これは異なるデータから同じハッシュ値が生成される問題のことであり、元のデータがどんな長さであっても生成される値のbit長が決められているため、衝突のないハッシュ関数は存在しない。従って、ハッシュ値のbit長が長ければ長いほどハッシュ衝突は起こりにくくなる。ハッシュ衝突の回避率はbit数が1増えると2倍になる。現在、暗号の安全性は128bit安全性が推奨されており、SHA256が128bit安全性を満足するハッシュ関数の一つである。従って、本研究でもハッシュ関数としてSHA256を用いる。
+
+\chapter{SAS認証方式(Simple And Secure password authentication protocol)}
+
+\section{SAS-2}
+SAS-2\cite{seven}はインターネットでの利用に適したワンタイムパスワード認証方式S/Keyを改善した方式で、2002年に高知工科大学の清水明宏教授によって開発されたワンタイムパスワード認証方式である。Bellcore社が開発したワンタイムパスワード認証方式S/keyはハッシュ関数を何度も繰り返し適用させることで認証情報の作成を行っているが、SAS-2はハッシュ関数のほか、排他的論理和、加算をそれぞれ数回行うことで認証情報の作成する。これにより、SAS-2は演算負荷に大きく関わるハッシュ関数の適用回数を減らすことで速度性能を改善することができる。SAS-2は初回認証の前に行われる登録手順と、認証手順に分かれており、以降の項で示す定義と表記法で認証を行う。
+
+\subsection{SAS-2の定義と表記法}
+SAS-2認証方式で用いる記号等について以下に示す。
+
+\begin{itemize}
+\item \textbf{User}：被認証側であるコンピュータユーザ
+\item \textbf{Server}：認証側であるコンピュータサーバ
+\item \textbf{S}：ユーザの識別子となるパスワード
+\item \textbf{n}：認証セッション回数を示す整数
+\item \textbf{Nn}：n回目の認証に用いられる乱数
+\item \textbf{An}：n回目の認証に用いられる認証情報
+\item \textbf{H}：ハッシュ関数
+\item \textbf{$\bigoplus$}：XOR演算
+\item \textbf{A→B}：AからBへの送信
+\end{itemize}
+
+\subsection{SAS-2登録手順}
+SAS-2における登録では、User側で初期情報を生成し、Server側に送信する。図2.1に登録手順のフローチャートを示す。
+
+\begin{enumerate}
+\item \textbf{User} \hspace{49pt}：ユーザ識別子Sを設定・保持
+\item \textbf{User} \hspace{49pt}：$N_1$を生成し保存
+\item \textbf{User} \hspace{51pt}：$H(S \bigoplus N_1)$の計算結果を認証情報$A_1$として保存
+\item \textbf{User $\rightarrow$ Server}：$A_1$を安全な手段で送信
+\item \textbf{Server} \hspace{42pt}：$A_1$を保存
+\end{enumerate}
+
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.6]{./SAS-2first.png}
+ \caption{SAS-2の初期登録手順}
+\end{figure}
+
+\subsection{SAS-2認証手順}
+
+SAS-2における認証手順では, Userから送られてきた認証情報を用いて、Serverが今回の認証情報を計算することでUserの認証を行う。図2.2に認証手順のフローチャートを示す。
+
+\begin{enumerate}
+\item \textbf{User} \hspace{49pt}：ユーザ識別子S、乱数$N_n$設定・保持
+\item \textbf{Server} \hspace{41pt}：認証情報$A_n$を保持
+\item \textbf{User} \hspace{50pt}：乱数$N_{n+1}$を生成し保存
+\item \textbf{User} \hspace{50pt}：$H$(S $\bigoplus N_{n+1}$)を計算し、$A_{n+1}$として保存
+\item \textbf{User} \hspace{50pt}：$H(A_{n+1}) \bigoplus A_n$を計算し、$\alpha$として保存
+\item \textbf{User} \hspace{50pt}：$A_{n+1} \bigoplus A_n$を計算し、$\beta$として保存
+\item \textbf{User $\rightarrow$ Server}：$\alpha、 \beta$を送信
+\item \textbf{Server} \hspace{42pt}：$H(\beta \bigoplus A_n) \bigoplus \alpha$が$A_n$と一致するか比較 \\
+\hspace{92pt}不一致→認証失敗 \\ 
+\hspace{92pt}一致→認証成立となり、$A_{n+1}$を新たな認証情報として保存
+\end{enumerate}
+
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.6]{./SAS-2.png}
+ \caption{SAS-2のn回目認証手順}
+\end{figure}
+
+\section{SAS-L2}
+SAS-L2\cite{eight}は前節で述べたSAS-2における被認証者側の演算負荷を改善する方式で、SAS-L認証方式\cite{nine}の1つとして2018年に清水明宏教授によって提案された。SAS-L2の認証情報は被認証者側におけるハッシュ関数を使用せず、排他的論理和と加算を数回行うのみで実現可能であるため、SAS-2よりもさらに速度性能を改善することに成功した。SAS-2とSAS-L2の違いは、SAS-2がユーザ側が保持していたユーザ識別子を設定しているのに対して、SAS-L2では認証者であるサーバ側がユーザ識別子を設定・管理している点である。SAS-L2はSAS-2と同様に、初回認証の前に行われる登録手順と、認証手順に分かれており、以降の項で示す定義と表記法で認証を行う。
+
+\subsection{SAS-L2の定義と表記法}
+SAS-L2認証方式で用いる記号等について以下に示す。
+
+\begin{itemize}
+\item \textbf{User}：被認証側であるコンピュータユーザ
+\item \textbf{Server}：認証側であるコンピュータサーバ
+\item \textbf{S}：ユーザの識別子となるパスワード
+\item \textbf{n}：認証セッション回数を示す整数
+\item \textbf{Nn}：n回目の認証に用いられる乱数
+\item \textbf{Mn}：n回目の認証に用いられる秘匿情報
+\item \textbf{An}：n回目の認証に用いられる認証情報
+\item \textbf{H}：ハッシュ関数
+\item \textbf{+}：加算
+\item \textbf{$\bigoplus$}：XOR演算
+\item \textbf{A→B}：AからBへの送信
+\end{itemize}
+
+\subsection{SAS-L2登録手順}
+SAS-L2における登録では、Server側で初期情報を生成し、User側に送信する。図2.3に登録手順のフローチャートを示す。
+
+\begin{enumerate}
+\item \textbf{Server} \hspace{41pt}：ユーザ識別子Sを設定・保持
+\item \textbf{Server} \hspace{41pt}：$N_1$を生成し保存
+\item \textbf{Server} \hspace{41pt}：$H(S \bigoplus N_1)$の計算結果を認証情報$A_1$として保存
+\item \textbf{Server} \hspace{41pt}：秘匿情報$M_1$を乱数から生成し保存
+\item \textbf{Server $\rightarrow$ User}：$A_1、M_1$を安全な手段で送信
+\item \textbf{User} \hspace{52pt}：$A_1、M_1$を保存
+\end{enumerate}
+
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.6]{./SAS-L2first.png}
+ \caption{SAS-L2の初期登録手順}
+\end{figure}
+
+\subsection{SAS-L2認証手順}
+SAS-L2における認証手順では, まずはServerから送られてきた認証情報を用いて、Userが計算を行い、その計算結果をServerに送る。ServerはUserから送られてきた計算結果とServerで計算していた結果が一致するかどうかを検証することでUserの認証を行う。図2.4に認証手順のフローチャートを示す。
+
+\begin{enumerate}
+\item \textbf{Server} \hspace{41pt}：ユーザ識別子S、乱数$N_n$設定・保持
+\item \textbf{User} \hspace{50pt}：認証情報$A_n$を保持
+\item \textbf{Server} \hspace{41pt}：$H$(S $\bigoplus N_n$)を計算し、$A_n$として保存
+\item \textbf{Server} \hspace{41pt}：乱数$N_{n+1}$を生成し保存
+\item \textbf{Server} \hspace{41pt}：$H$(S $\bigoplus N_{n+1}$)を計算し、$A_{n+1}$として保存
+\item \textbf{Server} \hspace{41pt}：$A_{n+1} \bigoplus A_n \bigoplus M_n$を計算し、$\alpha$として保存
+\item \textbf{Server $\rightarrow$ User}：$\alpha、n$を送信
+\item \textbf{User} \hspace{50pt}：($\alpha \bigoplus A_n \bigoplus M_n$) $+ A_n$を計算し、$\beta$として保存
+\item \textbf{User $\rightarrow$ Server}：$\beta$を送信
+\item \textbf{User} \hspace{51pt}：$A_n + M_n$を計算し、$M_{n+1}$として保存、$M_n、M_{n+1}$を保持
+\item \textbf{User} \hspace{51pt}：$A_{n+1} + A_n$が$\beta$と一致するか比較 \\
+\hspace{91pt}不一致→認証失敗 \\
+\hspace{91pt}一致→$A_{n+1}$を認証情報として保持、$M_{n+1} = A_n + M_n$、\\
+\hspace{128pt}$n = n+1$として更新
+\end{enumerate}
+
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.6]{./SAS-L2.png}
+ \caption{SAS-L2のn回目認証時手順}
+\end{figure}
+
+\section{計算回数比較}
+
+SAS-2は3.2で述べたようにユーザ側においてハッシュ関数の適用回数が3回、排他的論理和の適用回数は4回である。さらに認証情報$A_n$を記憶し再利用すれば、ハッシュ関数の適用回数を2回、排他的論理和の適用回数を3回にすることができる。また、サーバ側においては、ハッシュ関数の適用回数は1回、排他的論理和の適用回数は2回である。
+
+これに対して、SAS-L2はサーバ側においてハッシュ関数の適用回数は2回、排他的論理和の適用回数は4、加算の適用回数は2回である。さらに認証情報$A_n$を記憶し、再利用すれば、ハッシュ関数の適用回数を1回、排他的論理和の適用回数を3回にすることができる。一方、ユーザ側におけるハッシュ関数の適用回数は0回、排他的論理和の適用回数は2回、加算の適用回数は2回である。
+
+本研究では、IoT機器TWELITEとの暗号通信を実現する。認証に用いるワンタイムパスワード認証方式の速度性能が高いほうが優れているおり、速度性能は使用されている演算によって決められるため、処理負荷の大きいハッシュ関数の使用回数が少ないSAS-L2の方を用いる。
+
+SAS-2とSAS-L2との比較を表3.1に示す。表3.1の括弧内の数字は前回の認証情報記憶の場合である。
+
+\begin{table}[h]
+  \centering
+  \caption{性能比較}
+  \begin{tabular}{|c|c|c|c|c|c|c|} \hline
+    \multirow{2}{*}{ } & \multicolumn{3}{c|}{ユーザ側} & \multicolumn{3}{c|}{サーバ側} \\ \cline{2-7}
+      & ハッシュ計算 & XOR & 加算 & ハッシュ計算 & XOR & 加算 \\ \hline
+    SAS-2 & 3(2) & 4(3) & 0 & 1 & 2 & 0 \\ \hline
+    SAS-L2 & 0 & 2 & 2 & 2(1) & 4(3) & 2 \\ \hline
+  \end{tabular}
+\end{table}
+
+\chapter{TWELITE} 
+\quad TWELITE\cite{ten}とは、モノワイヤレス社が開発した無線内蔵マイコンであり、センサーやスイッチ、LED等を接続した親基板に実装することで小型無線装置を作成できる。センサーネットワーク、IoT(モノのインターネット)、M2M(機器間通信)等の世界規模で市場が拡大している多様なアプリケーションでモノの無線化を実現するための便利な部品で、主にセットメーカ-やシステムインテグレータ向けに製品が提供されている。TWELITEには無線の送信出力が標準(1mW)のTWELITE-BLUEと高出力(10mW)のTWELITE-REDがあるが、本研究ではTWELITE-BLUEを使用する。TWELITE-BLUE、TWELITE-REDの写真をそれぞれ図4.1、図4.2に示す。
+
+\begin{figure}[htbp]
+  \begin{minipage}[b]{0.45\linewidth}
+    \centering
+    \includegraphics[keepaspectratio, scale=0.15]{./TWELITE.png}
+    \caption{TWELITE-BLUE}
+  \end{minipage}
+  \begin{minipage}[b]{0.45\linewidth}
+    \centering
+    \includegraphics[keepaspectratio, scale=0.15]{./TWELITE-R.png}
+    \caption{TWELITE-RED}
+  \end{minipage}
+\end{figure}
+
+TWELITEの特徴は以下の4つが挙げられる。
+
+\begin{itemize}
+\item \textbf{小型} \\ 
+大きさ13.97mm$\times$13.97mm$\times$2.5mm、重さ0.93gの一円玉よりも小さくて軽い小型サイズで、様々なモノに実装可能である。 
+\item \textbf{省電力} \\ 
+各処理の消費電力を小さくし、起動時間と処理時間を短縮することで低消費電力を実現。例として、TWELITE-BLUEにおいて1パケットを30バイトで送信したときの標準的な消費電流を図4.3に示す。
+
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.2]{./Current_BLUE.png}
+ \caption{TWELITE-BLUEでの消費電流}
+\end{figure}
+
+また、その他の特徴として、小容量のコイン型電池で消費電力の制約で難しかったモノの無線化を実現可能である。例として、容量220mAhのコイン型電池（CR2032）を使用した場合の電池寿命を図4.4に示す。
+
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.4]{./TWE-CR2032.png}
+ \caption{電池寿命(CR2032使用時)}
+\end{figure}
+
+30秒毎にデータの送信をしたとしても電池寿命は10年を超えることが分かる。
+
+\item \textbf{長距離通信} \\ 
+低消費電力を保ちつつ、2.4GHz無線を使用する。無線仕様を表4.1に示す。
+
+\begin{table}[h]
+  \centering
+  \caption{無線仕様}
+  \begin{tabular}{|c|c|c|} \hline
+　　 & TWELITE-BLUE & TWELITE-RED \\ \hline
+    無線規格 & \multicolumn{2}{c|}{IEEE802.15.4準拠} \\ \hline
+    周波数 & \multicolumn{2}{c|}{2.4GHz} \\ \hline
+    チャネル数 & \multicolumn{2}{c|}{16チャネル} \\ \hline
+    通信速度 & \multicolumn{2}{c|}{250kbps(IEEE802.15.4)} \\ \hline
+    送信出力 & +2.5dBm & +9.14dBm \\ \hline
+    送信電流 & 15.3mA & 23.3mA \\ \hline
+    受信電流 & 17.0mA & 14.7mA \\ \hline
+    暗号化 & \multicolumn{2}{c|}{AES-128} \\ \hline
+  \end{tabular}
+\end{table}
+
+\item \textbf{高性能CPU} \\ 
+最大32MHzで動作する32bit RISC CPUで、外部に制御用のマイコンが不要で製品の小型化や簡素化、コスト低減を実現する。
+\end{itemize}
+
+\section{TWELITEスターターキット}
+本研究では、TWELITEの使用をスムーズに行えるように製品化されている入門セット「TWELITE スターターキット」を使用する。TWELITEスターターキットはTWELITEに出荷時に書き込まれている標準アプリの動作確認を行うことができ、さらにはTWELITE STAGE SDKと呼ばれるTWELITEを動作させるためのアプリケーションの構築、書換、設定、そして、データを表示する機能を統合した評価開発環境をダウンロードしてプログラミングを始めることもできるといった特徴がある。TWELITEスターターキットの付属製品については以下の通りである。
+\begin{itemize}
+  \item TWELITE STAGE BOARD 2台
+  \item TWELITE DIP(アンテナ実装済\&アンテナ別) 1台ずつ
+  \item TWELITE R$_2$ 1台
+\end{itemize}
+
+それぞれの付属品について説明する。
+\subsection{TWELITE STAGE BOARD}
+TWELITE STAGE BOARDはTWELITEの評価開発用基板である。TWELITE DIPを接続する事で簡単に無線通信を体験でき、TWELITE R$_2$を接続することでプログラミングを書き込むことができる。TWELITE STAGE BORADを図4.5に示す。
+
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.3]{./TWELITESTAGEBOARD.png}
+ \caption{TWELITE STAGE BOARD}
+\end{figure}
+
+\subsection{TWELITE DIP}
+TWELITE DIPはTWELITEを2.54mmピッチの基板に搭載した28ピンDIP型である。特徴としては、手作業での配線が容易で汎用基板やソケットに直接搭載でき、試作や小規模ロット生産に適している、32ビットマイコンを内蔵しデジタル、アナログ、シリアルの入出力があるため、外部に制御用のマイコンを必要とせず各種センサーやLED等を接続して無線通信を行うことができるといった点がある。TWELITE DIPを図4.6に示す。
+
+\begin{figure}[htbp]
+  \begin{minipage}[b]{0.45\linewidth}
+    \centering
+    \includegraphics[keepaspectratio, scale=0.15]{./TWELITEDIPA.png}
+    \caption{TWELITE DIP\\ (アンテナ実装済)}
+  \end{minipage}
+  \begin{minipage}[b]{0.45\linewidth}
+    \centering
+    \includegraphics[keepaspectratio, scale=0.1]{./TWELITEDIPN.png}
+    \caption{TWELITE DIP\\ (アンテナ別)}
+  \end{minipage}
+\end{figure}
+
+\subsection{TWELITE R$_2$}
+TWELITE R2はUSB接続するためのアダプターで、パソコンにUSBで接続し、アプリの詳細設定やアプリ書き込みに使用する。USBコネクターの種類はType-Cである。TWELITE R$_2$を図4.8に示す。
+
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.3]{./TWELITER2.png}
+ \caption{TWELITE R$_2$}
+\end{figure}
+
+また使用手順は以下のようになる。
+\begin{enumerate}
+  \item TWELITE R2にTWELITE DIPを接続する
+  \item TWELITE R2にUSBケーブルを接続する
+  \item パソコンにUSBケーブルを接続する
+  \item TWELITE STAGEを起動する
+  \item 書き込みまたは設定をする
+\end{enumerate}
+
+\section{プログラミング環境}
+TWELITEで無線通信を実現する方法だが、無線通信プログラムをROMに書き込まなければならない。TWELITEで動くプログラムは「TWELITE APPS」と「act」の2種類がある。以下にそれぞれについて説明する\cite{eleven}。
+\begin{itemize}
+  \item TWELITE APPS \\
+  工場出荷時に組み込まれているプログラムであり、TWELITE専用のライブラリ「MWSDK」のみを用いることでTWELITEの機能を利用することができる。
+  \item act \\
+  TWELITEのプログラムをより簡単に書けるようにした「MWXライブラリ」と呼ばれるライブラリを使用する。C言語の一部を利用でき、Arduinoのプログラムに似た書式で開発できるため、TWELITE APPSよりプログラムをシンプルに書ける
+\end{itemize}
+
+また、TWELITE APPSとactの比較を表4.2に示す。
+
+\begin{table}[h]
+  \centering
+  \caption{TWELITE APPSとactの比較}
+  \begin{tabular}{|c|c|c|c|c|} \hline
+     種類 & 利用ライブラリ & 言語 & 複雑さ & 書き換え方法 \\ \hline
+     TWELITE APPS & MWSDK & 独自 & 複雑 & 
+     \begin{tabular}{c}
+     TWELITE APPS \\ ビルド\&書換
+     \end{tabular} \\ \hline
+     act &
+     \begin{tabular}{c}
+     MWSDK\\$+$MWXライブラリ 
+     \end{tabular}
+     & Arduino似 & シンプル & Actビルド\&書換 \\ \hline
+  \end{tabular}
+\end{table}
+
+本研究では、ドキュメント、サンプルプログラムともに充実しており、TWELITEを提供しているモノワイヤレス社が推奨しているactを使用する。
+
+\chapter{実装及び評価実験}
+\section{SAS-L2のプログラミング開発環境}
+表5.1に示すPCを用いてTWELITEに対するプログラミングを行った。プログラムを書き込む際にはUSBでTWELITEを接続しシリアル通信でプログラムをTWELITEに転送する。
+
+\begin{table}[h]
+  \centering
+  \caption{開発用PC}
+  \begin{tabular}{|c|c|} \hline
+    CPU & Intel Core i5-7200U 2.50[GHz] \\ \hline
+    メモリ & 4[GB] \\ \hline
+    ディスク & 97.4[GB] \\ \hline
+    OS & Windows 10 Home \\ \hline
+    テキストエディタ & Atom version1.58.0 \\ \hline
+  \end{tabular}
+\end{table}
+
+\section{SAS-L2実装のシステム構築}
+本研究では、TWELITEの親機設定にしている方をサーバ側、子機設定にしている方をユーザ側とする。プログラムを書き込む際の概念図を図5.1に示す。また、SAS-L2の認証が正しく行えているか確認する際の概念図を図5.2に示す。
+
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.45]{./image5-1.png}
+ \caption{プログラム書込の概念図}
+\end{figure}
+
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.45]{./image5-2.png}
+ \caption{SAS-L2の認証確認の概念図}
+\end{figure}
+
+\section{SAS-L2の実装}
+TWELITE間での無線通信についてSAS-L2の認証を5秒ごとに計100回行い、サーバ側、ユーザ側の総処理時間の平均および演算部分と通信部分のそれぞれの処理時間の平均を求める。
+
+本研究では、SAS-L2におけるユーザ識別子$S$、乱数$N_n$、$N_{n+1}$を128bit、その他、認証情報$A_n$、$A_{n+1}$、秘匿情報$M_n$、$M_{n+1}$、$\alpha$、$\beta$は256bitとして扱う。従って乱数と識別子の排他的論理和は128bitの演算を行い、それ以外の排他的論理和は256bitの演算を行う。128bitや256bitの演算を一度に行うことができないので、8bitを単位とした排他的論理和や加算のアルゴリズムを実装した。
+
+乱数についてはMWXライブラリの関数randomを用いて128bitの乱数を生成した。
+
+SHA256については暗号ライブラリをTWELITEで利用できないため、SHA256のアルゴリズムからＣ言語で作成した。
+
+また、無線通信においてのパケットの配送は、IEEE802.15.4のブロードキャストを用いる。ACKを用いないため、配送の成功が送信元では判別できず、替わりに適当な再送回数を設定する必要がある。本来、無線パケットの送信成功率は1回のみでは9割程度であるが、本研究では再送回数を1回に設定するため、計2回送信することで無線通信の推奨環境下ではほぼ確実にパケットを配送することができる。
+
+\section{SAS-L2を実装した無線通信の評価実験}
+本節では、SAS-L2を実装した無線通信のサーバ側、ユーザ側における処理時間の評価を行う。サーバ側とユーザ側、それぞれの総処理時間の平均をまとめた表を表5.2に示す。
+
+\begin{table}[h]
+  \centering
+  \caption{総処理時間平均の計測結果(ms)}
+  \begin{tabular}{|c|c|c|} \hline
+     & サーバ & ユーザ \\ \hline
+    処理時間 & 117.41 & 14.59 \\ \hline
+  \end{tabular}
+\end{table}
+
+また排他的論理和、加算、ハッシュ関数、乱数など演算処理を行う部分の処理時間(演算時間と書く)、通信処理を行う部分の処理時間(通信時間と書く)のそれぞれについて平均処理時間を計測した。その結果を表5.3と表5.4にまとめる。
+
+\begin{table}[h]
+  \begin{minipage}[c]{0.5\hsize}
+    \centering
+    \caption{サーバ側の計測結果}
+    \begin{tabular}{|c|c|c|} \hline
+      & 演算時間(ms) & 通信時間(ms) \\ \hline
+      処理時間 & 27.52 & 0.71 \\ \hline
+    \end{tabular}
+  \end{minipage}
+  \begin{minipage}[c]{0.5\hsize}
+    \centering
+    \caption{ユーザ側の計測結果}
+    \begin{tabular}{|c|c|c|} \hline
+      & 演算時間(ms) & 通信時間(ms) \\ \hline
+      処理時間 & 13.97 & 0.62 \\ \hline
+    \end{tabular}
+  \end{minipage}
+\end{table}
+
+SAS-L2のサーバとユーザでの総処理時間を表す棒グラフを図5.3に示す。
+
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.65]{./graph2.png}
+ \caption{総処理時間の比較}
+\end{figure}
+
+また演算時間と通信時間をサーバとユーザで比較した棒グラフを図5.4に示す。
+
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.68]{./graph1.png}
+ \caption{各処理時間の比較}
+\end{figure}
+
+表5.2からユーザの総処理時間は14.59ミリ秒であり、表5.4に示した演算時間と通信時間の合計値14.59ミリ秒と同じ値が得られている。一方で、表5.2に示されるサーバの総処理時間は117.41ミリ秒は、表5.3から得られるサーバの演算時間と通信時間の合計値28.23ミリ秒の約4.15倍である。この理由は、サーバが認証情報として$\alpha、n$を送信し、ユーザから認証情報$\beta$を受信するまで、サーバは常にパケットを受信できる状態にしているためである。
+
+また、図5.4から、ユーザの演算時間はサーバの演算時間の約1/2倍であることがわかる。この差はサーバ側では排他的論理和2回、ハッシュ関数2回、乱数1回の計算が行われるためである。
+
+IoT機器の電池を交換せず、例えば1年以上動作させるためには、図4.4から2秒間隔で通信させることが望まれる。表5.2からTWILITE上での1回のSAS-L2認証のために平均0.132秒(表5.2の合計値)で行うことができ、必要な秒間隔の約7/100の時間で認証が終わることを示している。以上の処理時間評価により、TWELITE上でのSAS-L2の有効性を確認することができた。
+
+\chapter{結論と今後の課題}
+\quad 本研究では、SAS-L2をTWELITEに実装し、SAS-L2による認証が実装できることを確認した。また、認証のための計算時間の評価を行い、TWELITEにおけるSAS-L2の有効性を示すことができた。
+
+IoT機器のSAS-L2認証において、バッテリー切れや障害のため通信が途絶えると、ユーザあるいはサーバで認証情報が更新されない問題がある。今後の課題としては、
+\begin{itemize}
+  \item IoT機器における認証情報の同期
+\end{itemize}
+に関する検討があげられる。
+
+\acknowledgement
+
+\quad 本研究を遂行するにあたり、終始ご指導を賜り、有益な御議論及び御助言を頂きました高橋寛教授、甲斐博准教授、王森レイ講師に心より御礼申し上げます.。また、本研究に際しご審査頂きました樋上喜信教授、梶原智之助教に深く御礼申し上げます. 最後に、日頃から助言や励ましをいただきました諸先輩方、並びに同研究室の皆様に深く御礼を申し上げます。
+
+\begin{thebibliography}{99}
+\bibitem{one}
+"ITを分かりやすく解説", "ハッシュ関数の仕組みを図解で分かりやすく解説", 最終更新日(2021/03/17), \\
+\url{https://medium-company.com/md5/}, 参照日(2022/01/24)
+%
+\bibitem{two}
+"ITを分かりやすく解説", "MD5とは", 最終更新日(2020/08/24), \\
+\url{https://medium-company.com/md5/}, 参照日(2022/01/25)
+%
+\bibitem{three}
+"ITを分かりやすく解説", "SHA-1とは", 最終更新日(2020/08/24), \\
+\url{https://medium-company.com/sha-1/}, 参照日(2022/01/25)
+%
+\bibitem{four}
+"ITを分かりやすく解説", "SHA-2とは", 最終更新日(2020/08/24), \\
+\url{https://medium-company.com/sha-2/}, 参照日(2022/01/25)
+%
+\bibitem{five}
+FIPS PUB 180-4, "Secure Hash Standard(SHS)", 2015年8月 \\
+\url{https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf} 
+%
+\bibitem{six}
+Aram Mine, "SHA-256 ブロックチェーンの暗号技術を支えるハッシュ関数", \\
+\url{https://gaiax-blockchain.com/sha-256}, 参照日(2022/01/28)
+%
+\bibitem{seven}
+T.Tsuji, A.Shimizu, "Simple And Secure password authentication protocol Ver.2 (SAS-2)", IE ICE Technical Reports, OIS2002-30, 2002
+%
+\bibitem{eight}
+太田愛里, "IoTに適したワンタイムパスワード認証方式に関する研究", 高知工科大学修士学位論, 2017
+%
+\bibitem{nine}
+清水明宏, "SAS-L ワンタイムパスワード認証方式について", 高知工科大学, preprint, 2020
+
+\bibitem{ten}
+モノワイヤレス株式会社, "モノをつなぐ無線マイコンモジュール TWELITE", \\
+\url{https://mono-wireless.com/jp/products/TWE-LITE/index.html}
+%
+\bibitem{eleven}
+大澤文孝 (2021) 「TWELITEではじめるカンタン電子工作 改訂版」 工学社
+%
+\end{thebibliography}
+
+\appendix
+
+\chapter{コンパイルおよび実行方法}
+本研究で作成したプログラムのコンパイルおよび実行方法について説明する。
+\begin{enumerate}
+\item モノワイヤレス社のホームページよりダウンロードした「TWELITE STAGE SDK」のファイル中のアプリケーション「TWELITE\_Stage」を起動する
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.45]{./another1.png}
+\end{figure}
+
+\item 4.1.3項で説明したTWELITE R$_2$を接続しているシリアルポートを選択する
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.6]{./another2.png}
+\end{figure}
+
+\item アプリ書換を選択する
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.65]{./another3.png}
+\end{figure}
+
+\item Actビルド\&書換を選択する
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.65]{./another4.png}
+\end{figure}
+
+\item TWELITEに書き込むプログラムを選択する(画像はサーバ側のプログラム)
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.65]{./another5.png}
+\end{figure}
+
+\item 書き込み完了 \\
+Enterを押すとプログラムが開始される
+\begin{figure}[H]
+ \center
+ \includegraphics[scale=0.65]{./another6.png}
+\end{figure}
+\end{enumerate}
+
+\chapter{プログラムリスト}
+\quad 本研究で使用したサーバ側のプログラムおよびユーザ側のプログラムを以下に示す。
+\section{サーバ側プログラム}
+\begin{lstlisting}
+//use twelites mwx  c++ template library
+#include <TWELITE>
+#include <NWK_SIMPLE>
+#include <BRD_APPTWELITE>
+
+#ifdef _MSC_VER
+#ifndef uint8_t
+typedef unsigned __int8 uint8_t;
+#endif
+#ifndef uint32_t
+typedef unsigned __int32 uint32_t;
+#endif
+#else
+#include <stdint.h>
+#endif
+
+#define SHA256_BYTES 32
+typedef struct {
+  uint8_t  buf[64];
+  uint32_t hash[8];
+  uint32_t bits[2];
+  uint32_t len;
+} sha256_context;
+
+#define FN_ inline static
+
+static const uint32_t K[64] = {
+  0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
+  0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+  0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,
+  0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+  0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc,
+  0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+  0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7,
+  0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+  0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13,
+  0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+  0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3,
+  0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+  0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5,
+  0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+  0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
+  0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+};
+
+#ifdef MINIMIZE_STACK_IMPACT
+static uint32_t W[64];
+#endif
+
+/***Config part*/
+//application ID
+const uint32_t APP_ID = 0x1234abcd;
+
+//channel
+const uint8_t CHANNEL = 13;
+
+/***funcyion prototype*/
+MWX_APIRET transmit_first();
+MWX_APIRET transmit_alphan();
+MWX_APIRET transmit_beta();
+void receive_first();
+void receive_alphan();
+void receive_beta();
+void binary_print(unsigned char a);
+void sha256_init(sha256_context *ctx);
+void sha256_hash(sha256_context *ctx, const void *data, size_t len);
+void sha256_done(sha256_context *ctx, uint8_t *hash);
+
+/***application defs*/
+int password[] = {20, 56, 1, 234, 23, 45, 176, 89, 56, 78, 201, 123, 88, 189, 45, 245};
+uint8_t Hash[] = {72, 197, 105, 108, 182, 68, 113, 1, 128, 62, 111, 233, 219, 7, 193, 187, 92, 212, 13, 193, 156, 164, 238, 157, 15, 92, 232, 226, 217, 245, 55, 2};
+uint8_t Mn[] = {244, 24, 217, 252, 111, 69, 252, 27, 16, 132, 213, 227, 17, 232, 55, 229, 106, 166, 241, 133, 55, 142, 187, 237, 47, 246, 12, 37, 146, 173, 55, 85};
+uint8_t Nnext[16], Xor16[16], Xor32[32], alpha[32], Mnext[32];
+uint8_t beta[32], Server_beta[32], g_recv_beta[32];
+
+sha256_context ctx;
+char data[32];
+char recvdata[5];
+uint8_t u8devid = 0;
+uint16_t au16AI[5];
+uint8_t u8DI_BM;
+uint8_t HashNext[SHA256_BYTES];
+
+int number = 0;
+int n = 1;
+int iLedCounter = 0;
+double start = 0.0;
+double end = 0.0;
+double sum1 = 0.0;
+double sum2 = 0.0;
+double sumw = 0.0;
+double sys = 0.0;
+double sys1 = 0.0;
+double sys2 = 0.0;
+double sysa = 0.0;
+double sysb = 0.0;
+double sysc = 0.0;
+int count = 1;
+double ave1 = 0.0;
+double ave2 = 0.0;
+double avew = 0.0;
+double wait = 0.0;
+
+//初期登録したA1とM1//
+const char APP_ALPHADATA[] = "ABCZ";
+const char APP_BETADATA[] = "TWEL";
+
+/***set up procedure (run once at cold boot)*/
+void setup(){
+  //init vars
+  for(auto&& x : au16AI) x = 0xFFFF;
+  u8DI_BM = 0xFF;
+
+  /***SETUP section*/
+  auto&& brd = the_twelite.board.use<BRD_APPTWELITE>();
+
+  //check DIP sw settings
+  u8devid = (brd.get_M1()) ? 0x00 : 0xFE;
+
+  //setup analogue
+  Analogue.setup(true, ANALOGUE::KICK_BY_TIMER0);
+
+  //setup buttons
+  Buttons.setup(5); //init button manager with 5 history table.
+
+  //the twelite main class
+  the_twelite
+    << TWENET::appid(APP_ID)
+	  << TWENET::channel(CHANNEL)
+	  << TWENET::rx_when_idle();
+
+  //Register Network
+  auto&& nwksmpl = the_twelite.network.use<NWK_SIMPLE>();
+  nwksmpl << NWK_SIMPLE::logical_id(u8devid);
+
+  /***BEGIN section*/
+
+  //start ADC capture
+  Analogue.begin(pack_bits(
+    BRD_APPTWELITE::PIN_AI1,
+    BRD_APPTWELITE::PIN_AI2,
+    BRD_APPTWELITE::PIN_AI3,
+    BRD_APPTWELITE::PIN_AI4,
+    PIN_ANALOGUE::VCC)); //_start continuous adc capture.
+
+  //Timer setup
+  Timer0.begin(32, true); //32hz Timer
+
+  //start button check
+  Buttons.begin(pack_bits(
+    BRD_APPTWELITE::PIN_DI1,
+    BRD_APPTWELITE::PIN_DI2,
+    BRD_APPTWELITE::PIN_DI3,
+    BRD_APPTWELITE::PIN_DI4),
+    5,
+    4
+  );
+
+  the_twelite.begin(); //start twelite!
+  Serial << ("start wirelrss communication!\n");
+}
+
+/***loop procedure (called every event)*/
+void loop(){
+  if(Timer0.available()){
+    static uint8_t u16ct;
+    u16ct++;
+
+    if((u16ct % 160) == 0){
+      if(iLedCounter == 0){
+        digitalWrite(BRD_APPTWELITE::PIN_DO1, HIGH);
+        iLedCounter = 1;
+      }
+      else{
+        digitalWrite(BRD_APPTWELITE::PIN_DO1, LOW);
+        iLedCounter = 0;
+
+        start = millis();
+        Serial << format("random[%d] = ", n+1);
+        for(int i = 0; i < 16; ++i){
+          number = random(0, 255);
+          Nnext[i] = number;
+          Serial << format("%02d ", Nnext[i]);
+        }
+
+        Serial << format("pass xor N%d : ", n+1);
+        for(int i = 0; i < 16; i++){
+          Xor16[i] = 0;
+          Xor16[i] = password[i] ^ Nnext[i];
+          TWE_snprintf(&data[i*2], 32, "%02x", Xor16[i]);
+          Serial << format("%02d ", Xor16[i]);
+        }
+        Serial << "\n";
+
+        Serial << format("hash(in) = %s\n", data);
+
+        sha256_init(&ctx);
+        sha256_hash(&ctx, data, strlen(data));
+        sha256_done(&ctx, HashNext);
+
+        Serial << format("alpha(A%d xor A%d xor M%d) = \n", n+1, n, n);
+        for(int i = 0; i < 32; i++){
+          alpha[i] = HashNext[i] ^ Hash[i] ^ Mn[i];
+          Serial << format("%02d ", alpha[i]);
+        }
+        Serial << "\n";
+
+        end = millis();
+        sys1 = end-start;
+        start = millis();
+        transmit_alphan();
+        end = millis();
+        sysa = end-start;
+        start = millis();
+      }
+    }
+  }
+
+  if(the_twelite.receiver.available()){
+    end = millis();
+    wait = end-start;
+    start = millis();
+    receive_beta();
+    end = millis();
+    sysb = end-start;
+
+    start = millis();
+    Serial << format("A%d = ", n+1);
+
+    for(int i = 0; i < 32; i++){
+      Serial << format("%d ", HashNext[i]);
+    }
+    Serial << "\n";
+
+    Serial << format("A%d = ", n);
+    for(int i = 0; i < 32; i++){
+      Serial << format("%d ", Hash[i]);
+    }
+    Serial << "\n";
+
+    Serial << "Server Beta = ";
+    for(int i = 0; i < 32; i++){
+      Server_beta[i] = HashNext[i] + Hash[i];
+      Serial << format("%d ", Server_beta[i]);
+    }
+
+    Serial << "\n";
+    int check = 0;
+    for(int i = 0; i < 32; i++){
+      if( Server_beta[i] == g_recv_beta[i]){
+        check++;
+      }
+    }
+
+    if(check == 32){
+      Serial << "---OK! SAS-L2 complete!---\n";
+      for(int i = 0; i < 32; i++){
+        Mn[i] =  Hash[i] + Mn[i];
+        Hash[i] = HashNext[i];
+      }
+      n++;
+    }
+    else{
+      Serial << "---Error! Not complete!---\n\n";
+    }
+
+    end = millis();
+    sys2 = end-start;
+    sys = sys1 + sys2;
+    sysc = sysa + sysb;
+    sum1 += sys;
+    sum2 += sysc;
+    sumw += wait;
+    ave1 = double(sum1/count);
+    ave2 = double(sum2/count);
+    avew = double(sumw/count);
+    count++;
+    Serial << format("math average = %.2f\n\n", ave1);
+    Serial << format("comm average = %.2f\n\n", ave2);
+    Serial << format("wait average = %.2f\n\n", avew);
+  }
+}
+
+/***transmit a packet*/
+MWX_APIRET transmit_alphan() {
+  if(auto&& pkt = the_twelite.network.use<NWK_SIMPLE>().prepare_tx_packet()) {
+    Serial << "transmit!\n";
+    //set tx packet behavior
+    pkt << tx_addr(u8devid == 0 ? 0xFE : 0x00)
+        << tx_retry(0x1)
+        << tx_packet_delay(0,50,10);
+
+    //prepare packet payload
+    pack_bytes(pkt.get_payload()
+    , make_pair(APP_ALPHADATA, 4)
+    , uint8_t (alpha[0]), uint8_t (alpha[1]), uint8_t (alpha[2]), uint8_t (alpha[3])
+    , uint8_t (alpha[4]), uint8_t (alpha[5]), uint8_t (alpha[6]), uint8_t (alpha[7])
+    , uint8_t (alpha[8]), uint8_t (alpha[9]), uint8_t (alpha[10]), uint8_t (alpha[11])
+    , uint8_t (alpha[12]), uint8_t (alpha[13]), uint8_t (alpha[14]), uint8_t (alpha[15])
+    , uint8_t (alpha[16]), uint8_t (alpha[17]), uint8_t (alpha[18]), uint8_t (alpha[19])
+    , uint8_t (alpha[20]), uint8_t (alpha[21]), uint8_t (alpha[22]), uint8_t (alpha[23])
+    , uint8_t (alpha[24]), uint8_t (alpha[25]), uint8_t (alpha[26]), uint8_t (alpha[27])
+    , uint8_t (alpha[28]), uint8_t (alpha[29]), uint8_t (alpha[30]), uint8_t (alpha[31])
+    , uint8_t (n));
+
+    // do transmit
+    return pkt.transmit();
+  }
+  return MWX_APIRET(false, 0);
+}
+
+void receive_beta(){
+  auto&& rx = the_twelite.receiver.read();
+  Serial << "receive!\n";
+
+  //expand packet payload(shall match with sent packet data structure, see pack_bytes())
+  char betadata[5]{};
+  auto&& np = expand_bytes(rx.get_payload().begin(), rx.get_payload().end(), make_pair((uint8_t*)betadata, 4));
+
+  //check header
+  if(strncmp(APP_BETADATA, betadata, 4)){ return; }
+
+  uint8_t recv_beta[32];
+  expand_bytes(np, rx.get_payload().end()
+  , recv_beta[0], recv_beta[1], recv_beta[2], recv_beta[3]
+  , recv_beta[4], recv_beta[5], recv_beta[6], recv_beta[7]
+  , recv_beta[8], recv_beta[9], recv_beta[10], recv_beta[11]
+  , recv_beta[12], recv_beta[13], recv_beta[14], recv_beta[15]
+  , recv_beta[16], recv_beta[17], recv_beta[18], recv_beta[19]
+  , recv_beta[20], recv_beta[21], recv_beta[22], recv_beta[23]
+  , recv_beta[24], recv_beta[25], recv_beta[26], recv_beta[27]
+  , recv_beta[28], recv_beta[29], recv_beta[30], recv_beta[31]);
+
+  for(int i = 0; i < 32; i++){
+    g_recv_beta[i] = recv_beta[i];
+  }
+}
+
+FN_ uint8_t _shb(uint32_t x, uint32_t n){
+  return ( (x >> (n & 31)) & 0xff );
+} /*_shb*/
+
+FN_ uint32_t _shw(uint32_t x, uint32_t n){
+  return ( (x << (n & 31)) & 0xffffffff );
+} /*_shw*/
+
+FN_ uint32_t _r(uint32_t x, uint8_t n){
+  return ( (x >> n) | _shw(x, 32 - n) );
+} /*_r*/
+
+FN_ uint32_t _Ch(uint32_t x, uint32_t y, uint32_t z){
+  return ( (x & y) ^ ((~x) & z) );
+} /*_Ch*/
+
+FN_ uint32_t _Ma(uint32_t x, uint32_t y, uint32_t z){
+  return ( (x & y) ^ (x & z) ^ (y & z) );
+} /*_Ma*/
+
+FN_ uint32_t _S0(uint32_t x){
+  return ( _r(x, 2) ^ _r(x, 13) ^ _r(x, 22) );
+} /*_S0*/
+
+FN_ uint32_t _S1(uint32_t x){
+  return ( _r(x, 6) ^ _r(x, 11) ^ _r(x, 25) );
+} /*_S1*/
+
+FN_ uint32_t _G0(uint32_t x){
+  return ( _r(x, 7) ^ _r(x, 18) ^ (x >> 3) );
+} /*_G0*/
+
+FN_ uint32_t _G1(uint32_t x){
+  return ( _r(x, 17) ^ _r(x, 19) ^ (x >> 10) );
+} /*_G1*/
+
+FN_ uint32_t _word(uint8_t *c){
+  return ( _shw(c[0], 24) | _shw(c[1], 16) | _shw(c[2], 8) | (c[3]) );
+} /*_word*/
+
+FN_ void  _addbits(sha256_context *ctx, uint32_t n){
+  if ( ctx->bits[0] > (0xffffffff - n) )
+  ctx->bits[1] = (ctx->bits[1] + 1) & 0xFFFFFFFF;
+  ctx->bits[0] = (ctx->bits[0] + n) & 0xFFFFFFFF;
+} /*_addbits*/
+
+static void _hash(sha256_context *ctx){
+  register uint32_t a, b, c, d, e, f, g, h, i;
+  uint32_t t[2];
+  #ifndef MINIMIZE_STACK_IMPACT
+  uint32_t W[64];
+  #endif
+
+  a = ctx->hash[0];
+  b = ctx->hash[1];
+  c = ctx->hash[2];
+  d = ctx->hash[3];
+  e = ctx->hash[4];
+  f = ctx->hash[5];
+  g = ctx->hash[6];
+  h = ctx->hash[7];
+
+  for (i = 0; i < 64; i++) {
+    if ( i < 16 )
+      W[i] = _word(&ctx->buf[_shw(i, 2)]);
+    else
+      W[i] = _G1(W[i - 2]) + W[i - 7] + _G0(W[i - 15]) + W[i - 16];
+
+    t[0] = h + _S1(e) + _Ch(e, f, g) + K[i] + W[i];
+    t[1] = _S0(a) + _Ma(a, b, c);
+    h = g;
+    g = f;
+    f = e;
+    e = d + t[0];
+    d = c;
+    c = b;
+    b = a;
+    a = t[0] + t[1];
+  }
+
+  ctx->hash[0] += a;
+  ctx->hash[1] += b;
+  ctx->hash[2] += c;
+  ctx->hash[3] += d;
+  ctx->hash[4] += e;
+  ctx->hash[5] += f;
+  ctx->hash[6] += g;
+  ctx->hash[7] += h;
+} /*_hash*/
+
+void sha256_init(sha256_context *ctx){
+  if ( ctx != NULL ) {
+    ctx->bits[0] = ctx->bits[1] = 0;
+    ctx->len     = 0;
+    ctx->hash[0] = 0x6a09e667;
+    ctx->hash[1] = 0xbb67ae85;
+    ctx->hash[2] = 0x3c6ef372;
+    ctx->hash[3] = 0xa54ff53a;
+    ctx->hash[4] = 0x510e527f;
+    ctx->hash[5] = 0x9b05688c;
+    ctx->hash[6] = 0x1f83d9ab;
+    ctx->hash[7] = 0x5be0cd19;
+  }
+} /*sha256_init*/
+void sha256_hash(sha256_context *ctx, const void *data, size_t len){
+  register size_t i;
+  const uint8_t *bytes = (const uint8_t *)data;
+
+  if ( (ctx != NULL) && (bytes != NULL) )
+    for (i = 0; i < len; i++) {
+      ctx->buf[ctx->len] = bytes[i];
+      ctx->len++;
+      if (ctx->len == sizeof(ctx->buf) ) {
+        _hash(ctx);
+        _addbits(ctx, sizeof(ctx->buf) * 8);
+        ctx->len = 0;
+      }
+    }
+} /*sha256_hash*/
+
+void sha256_done(sha256_context *ctx, uint8_t *hash){
+  register uint32_t i, j;
+
+  if ( ctx != NULL ) {
+    j = ctx->len % sizeof(ctx->buf);
+    ctx->buf[j] = 0x80;
+    for (i = j + 1; i < sizeof(ctx->buf); i++)
+      ctx->buf[i] = 0x00;
+
+    if ( ctx->len > 55 ) {
+      _hash(ctx);
+      for (j = 0; j < sizeof(ctx->buf); j++)
+        ctx->buf[j] = 0x00;
+    }
+
+    _addbits(ctx, ctx->len * 8);
+    ctx->buf[63] = _shb(ctx->bits[0],  0);
+    ctx->buf[62] = _shb(ctx->bits[0],  8);
+    ctx->buf[61] = _shb(ctx->bits[0], 16);
+    ctx->buf[60] = _shb(ctx->bits[0], 24);
+    ctx->buf[59] = _shb(ctx->bits[1],  0);
+    ctx->buf[58] = _shb(ctx->bits[1],  8);
+    ctx->buf[57] = _shb(ctx->bits[1], 16);
+    ctx->buf[56] = _shb(ctx->bits[1], 24);
+    _hash(ctx);
+
+    if ( hash != NULL )
+      for (i = 0, j = 24; i < 4; i++, j -= 8) {
+        hash[i     ] = _shb(ctx->hash[0], j);
+        hash[i +  4] = _shb(ctx->hash[1], j);
+        hash[i +  8] = _shb(ctx->hash[2], j);
+        hash[i + 12] = _shb(ctx->hash[3], j);
+        hash[i + 16] = _shb(ctx->hash[4], j);
+        hash[i + 20] = _shb(ctx->hash[5], j);
+        hash[i + 24] = _shb(ctx->hash[6], j);
+        hash[i + 28] = _shb(ctx->hash[7], j);
+      }
+  }
+}
+\end{lstlisting}
+
+\newpage
+\section{ユーザ側プログラム}
+\begin{lstlisting}
+//use twelites mwx  c++ template library
+#include <TWELITE>
+#include <NWK_SIMPLE>
+#include <BRD_APPTWELITE>
+
+/***Config part*/
+//application ID
+const uint32_t APP_ID = 0x1234abcd;
+
+//channel
+const uint8_t CHANNEL = 13;
+
+/***funcyion prototype*/
+MWX_APIRET transmit_first();
+MWX_APIRET transmit_alphan();
+MWX_APIRET transmit_beta();
+void receive_first();
+void receive_alphan();
+void receive_beta();
+bool is_secure_pkt();
+
+/***application defs*/
+int password[] = {20, 56, 1, 234, 23, 45, 176, 89, 56, 78, 201, 123, 88, 189, 45, 245};
+uint8_t Hash[] = {72, 197, 105, 108, 182, 68, 113, 1, 128, 62, 111, 233, 219, 7, 193, 187, 92, 212, 13, 193, 156, 164, 238, 157, 15, 92, 232, 226, 217, 245, 55, 2};
+uint8_t Mn[] = {244, 24, 217, 252, 111, 69, 252, 27, 16, 132, 213, 227, 17, 232, 55, 229, 106, 166, 241, 133, 55, 142, 187, 237, 47, 246, 12, 37, 146, 173, 55, 85};
+uint8_t alpha[32];
+uint8_t HashNext[32];
+uint8_t g_recv_alpha[32];
+
+char data[32];
+char recvdata[5];
+
+uint8_t u8devid = 0;
+
+uint16_t au16AI[5];
+uint8_t u8DI_BM;
+uint8_t beta[32];
+
+int n = 0;
+int check = 0;
+double start = 0.0;
+double end = 0.0;
+double sum1 = 0.0;
+double sum2 = 0.0;
+double sys = 0.0;
+double sys1 = 0.0;
+double sys2 = 0.0;
+double sysa = 0.0;
+double sysb = 0.0;
+double sysc = 0.0;
+int count = 1;
+double ave1 = 0.0;
+double ave2 = 0.0;
+
+//初期登録したA1とM1//
+const char APP_FIRSTDATA[] = "A1M1";
+const char APP_ALPHADATA[] = "ABCZ";
+const char APP_BETADATA[] = "TWEL";
+
+/***set up procedure (run once at cold boot)*/
+void setup(){
+  //init vars
+  for(auto&& x : au16AI) x = 0xFFFF;
+  u8DI_BM = 0xFF;
+
+  /***SETUP section*/
+  auto&& brd = the_twelite.board.use<BRD_APPTWELITE>();
+
+  //check DIP sw settings
+  u8devid = (brd.get_M1()) ? 0x00 : 0xFE;
+
+  //setup analogue
+  Analogue.setup(true, ANALOGUE::KICK_BY_TIMER0);
+
+  //setup buttons
+  Buttons.setup(5); //init button manager with 5 history table.
+
+  //the twelite main class
+  the_twelite
+    << TWENET::appid(APP_ID)
+    << TWENET::channel(CHANNEL)
+    << TWENET::rx_when_idle();
+
+  //Register Network
+  auto&& nwksmpl = the_twelite.network.use<NWK_SIMPLE>();
+  nwksmpl << NWK_SIMPLE::logical_id(u8devid);
+
+  /***BEGIN section*/
+  //start ADC capture
+  Analogue.begin(pack_bits(
+    BRD_APPTWELITE::PIN_AI1,
+    BRD_APPTWELITE::PIN_AI2,
+    BRD_APPTWELITE::PIN_AI3,
+    BRD_APPTWELITE::PIN_AI4,
+    PIN_ANALOGUE::VCC)); //_start continuous adc capture.
+
+  //Timer setup
+  Timer0.begin(32, true); //32hz Timer
+
+  //start button check
+  Buttons.begin(pack_bits(
+    BRD_APPTWELITE::PIN_DI1,
+    BRD_APPTWELITE::PIN_DI2,
+    BRD_APPTWELITE::PIN_DI3,
+    BRD_APPTWELITE::PIN_DI4),
+    5,
+    4
+  );
+
+  the_twelite.begin(); //start twelite!
+  Serial << ("start wirelrss communication!\n");
+}
+
+/***loop procedure (called every event)*/
+void loop(){
+  if (the_twelite.receiver.available()) {
+    start = millis();
+    receive_alphan();
+    end = millis();
+    sysa = end-start;
+
+    Serial << format("A%d = ", n);
+    for(int i = 0; i < 32; i++){
+      Serial << format("%d ", Hash[i]);
+    }
+    Serial << "\n";
+
+    Serial << format("M%d = ", n);
+    for(int i = 0; i < 32; i++){
+      Serial << format("%d ", Mn[i]);
+    }
+    Serial << "\n";
+
+    Serial << "recv_alpha = ";
+    for(int i = 0; i < 32; i++){
+      Serial << format("%d ", g_recv_alpha[i]);
+    }
+    Serial << "\n";
+
+    for(int i = 0; i < 32; i++){
+      beta[i] = 0;
+    }
+
+    start = millis();
+    for(int i = 0; i < 32; i++){
+      HashNext[i] = g_recv_alpha[i] ^ Hash[i] ^ Mn[i];
+      beta[i] = HashNext[i] + Hash[i];
+    }
+
+    Serial << format("A%d = ", n+1);
+    for(int i = 0; i < 32; i++){
+      Serial << format("%d ", HashNext[i]);
+    }
+    Serial << "\n";
+
+    Serial << format("A%d = ", n);
+    for(int i = 0; i < 32; i++){
+      Serial << format("%d ", Hash[i]);
+    }
+    Serial << "\n";
+
+    Serial << "beta = ";
+    for(int i = 0; i < 32; i++){
+      Serial << format("%d ", beta[i]);
+    }
+    Serial << "\n";
+    end = millis();
+    sys1 = end-start;
+
+    start = millis();
+    transmit_beta();
+    end = millis();
+    sysb = end-start;
+
+    start = millis();
+    for(int i = 0; i < 32; i++){
+      Mn[i] = Hash[i] + Mn[i];
+      Hash[i] = HashNext[i];
+    }
+    end = millis();
+    sys2 = end-start;
+
+    sys = sys1 + sys2;
+    sysc = sysa + sysb;
+    sum1 += sys;
+    sum2 += sysc;
+    ave1 = double(sum1/count);
+    ave2 = double(sum2/count);
+    count++;
+    Serial << format("math average = %.2f\n\n", ave1);
+    Serial << format("comm average = %.2f\n\n", ave2);
+  }
+}
+
+/***transmit a packet*/
+MWX_APIRET transmit_beta() {
+  if(auto&& pkt = the_twelite.network.use<NWK_SIMPLE>().prepare_tx_packet()) {
+    Serial << "transmit!\n";
+
+    //set tx packet behavior
+    pkt << tx_addr(u8devid == 0 ? 0xFE : 0x00)
+        << tx_retry(0x1)
+        << tx_packet_delay(0,50,10);
+
+    //prepare packet payload
+    pack_bytes(pkt.get_payload()
+    , make_pair(APP_BETADATA, 4)
+    , uint8_t (beta[0]), uint8_t (beta[1]), uint8_t (beta[2]), uint8_t (beta[3])
+    , uint8_t (beta[4]), uint8_t (beta[5]), uint8_t (beta[6]), uint8_t (beta[7])
+    , uint8_t (beta[8]), uint8_t (beta[9]), uint8_t (beta[10]), uint8_t (beta[11])
+    , uint8_t (beta[12]), uint8_t (beta[13]), uint8_t (beta[14]), uint8_t (beta[15])
+    , uint8_t (beta[16]), uint8_t (beta[17]), uint8_t (beta[18]), uint8_t (beta[19])
+    , uint8_t (beta[20]), uint8_t (beta[21]), uint8_t (beta[22]), uint8_t (beta[23])
+    , uint8_t (beta[24]), uint8_t (beta[25]), uint8_t (beta[26]), uint8_t (beta[27])
+    , uint8_t (beta[28]), uint8_t (beta[29]), uint8_t (beta[30]), uint8_t (beta[31]));
+
+    // do transmit
+    return pkt.transmit();
+  }
+  return MWX_APIRET(false, 0);
+}
+
+void receive_alphan(){
+  auto&& rx = the_twelite.receiver.read();
+  Serial << "receive!\n";
+
+  //expand packet payload(shall match with sent packet data structure, see pack_bytes())
+  char alphadata[5]{};
+  auto&& np = expand_bytes(rx.get_payload().begin(), rx.get_payload().end(), make_pair((uint8_t*)alphadata, 4));
+
+  //check header
+  if(strncmp(APP_ALPHADATA, alphadata, 4)){ return; }
+
+  uint8_t recv_alpha[32] = {};
+  uint8_t times;
+  expand_bytes(np, rx.get_payload().end()
+  , recv_alpha[0], recv_alpha[1], recv_alpha[2], recv_alpha[3]
+  , recv_alpha[4], recv_alpha[5], recv_alpha[6], recv_alpha[7]
+  , recv_alpha[8], recv_alpha[9], recv_alpha[10], recv_alpha[11]
+  , recv_alpha[12], recv_alpha[13], recv_alpha[14], recv_alpha[15]
+  , recv_alpha[16], recv_alpha[17], recv_alpha[18], recv_alpha[19]
+  , recv_alpha[20], recv_alpha[21], recv_alpha[22], recv_alpha[23]
+  , recv_alpha[24], recv_alpha[25], recv_alpha[26], recv_alpha[27]
+  , recv_alpha[28], recv_alpha[29], recv_alpha[30], recv_alpha[31]
+  , times
+  );
+
+  for(int i = 0; i < 32; i++){
+    g_recv_alpha[i] = recv_alpha[i];
+  }
+  n = times;
+}
+\end{lstlisting}
+
+\end{document}

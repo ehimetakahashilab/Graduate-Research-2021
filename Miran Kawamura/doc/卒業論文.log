@@ -1,0 +1,473 @@
+This is e-pTeX, Version 3.141592653-p3.9.0-210218-2.6 (utf8.sjis) (TeX Live 2021/W32TeX) (preloaded format=platex 2021.12.24)  17 FEB 2022 15:49
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**卒業論文.tex
+(./卒業論文.tex
+pLaTeX2e <2020-10-01>+2 (based on LaTeX2e <2020-10-01> patch level 4)
+L3 programming layer <2021-02-18> (./thesis.cls
+Document Class: thesis 2003/03/04 v1.18 a pLaTeX class for the master thesises 
+and bachelor thesises in Ehime Univ.
+\c@@paper=\count178
+(c:/texlive/2021/texmf-dist/tex/latex/base/fleqn.clo
+File: fleqn.clo 2016/12/29 v1.2b Standard LaTeX option (flush left equations)
+\mathindent=\skip47
+Applying: [2015/01/01] Make \[ robust on input line 50.
+LaTeX Info: Redefining \[ on input line 51.
+Already applied: [0000/00/00] Make \[ robust on input line 62.
+Applying: [2015/01/01] Make \] robust on input line 74.
+LaTeX Info: Redefining \] on input line 75.
+Already applied: [0000/00/00] Make \] robust on input line 83.
+)
+\c@part=\count179
+\c@chapter=\count180
+\c@section=\count181
+\c@subsection=\count182
+\c@subsubsection=\count183
+\c@paragraph=\count184
+\c@subparagraph=\count185
+\c@figure=\count186
+\c@table=\count187
+\abovecaptionskip=\skip48
+\belowcaptionskip=\skip49
+\mycap@width=\dimen154
+\mycap@bodywidth=\dimen155
+\symmincho=\mathgroup4
+LaTeX Font Info:    Overwriting symbol font `mincho' in version `bold'
+(Font)                  JY1/mc/m/n --> JY1/gt/m/n on input line 977.
+\toclineskip=\dimen156
+\@lnumwidth=\dimen157
+\bibindent=\dimen158
+\heisei=\count188
+\@minsofar=\count189
+\@min=\count190
+\@cite@temp=\count191
+
+(c:/texlive/2021/texmf-dist/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+
+(c:/texlive/2021/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\@emptytoks=\toks16
+\symAMSa=\mathgroup5
+\symAMSb=\mathgroup6
+LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+))
+\c@definition=\count192
+\c@theorem=\count193
+\c@corollary=\count194
+\c@proposition=\count195
+\c@lemma=\count196
+\c@assumption=\count197
+
+(c:/texlive/2021/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2020/09/23 v2.17i AMS math features
+\@mathmargin=\skip50
+
+For additional information on amsmath, use the `?' option.
+(c:/texlive/2021/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2000/06/29 v2.01 AMS text
+
+(c:/texlive/2021/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks17
+\ex@=\dimen159
+))
+(c:/texlive/2021/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen160
+)
+(c:/texlive/2021/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 2016/03/08 v2.02 operator names
+)
+\inf@bad=\count198
+LaTeX Info: Redefining \frac on input line 234.
+\uproot@=\count199
+\leftroot@=\count266
+LaTeX Info: Redefining \overline on input line 399.
+\classnum@=\count267
+\DOTSCASE@=\count268
+LaTeX Info: Redefining \ldots on input line 496.
+LaTeX Info: Redefining \dots on input line 499.
+LaTeX Info: Redefining \cdots on input line 620.
+\Mathstrutbox@=\box64
+\strutbox@=\box65
+\big@size=\dimen161
+LaTeX Font Info:    Redeclaring font encoding OML on input line 743.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 744.
+\macc@depth=\count269
+\c@MaxMatrixCols=\count270
+\dotsspace@=\muskip16
+\c@parentequation=\count271
+\dspbrk@lvl=\count272
+\tag@help=\toks18
+\row@=\count273
+\column@=\count274
+\maxfields@=\count275
+\andhelp@=\toks19
+\eqnshift@=\dimen162
+\alignsep@=\dimen163
+\tagshift@=\dimen164
+\tagwidth@=\dimen165
+\totwidth@=\dimen166
+\lineht@=\dimen167
+\@envbody=\toks20
+\multlinegap=\skip51
+\multlinetaggap=\skip52
+\mathdisplay@stack=\toks21
+LaTeX Info: Redefining \[ on input line 2923.
+LaTeX Info: Redefining \] on input line 2924.
+)
+(c:/texlive/2021/texmf-dist/tex/latex/tools/enumerate.sty
+Package: enumerate 2015/07/23 v3.00 enumerate extensions (DPC)
+\@enLab=\toks22
+))
+(c:/texlive/2021/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2020/09/09 v1.2b Enhanced LaTeX Graphics (DPC,SPQR)
+
+(c:/texlive/2021/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks23
+)
+(c:/texlive/2021/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2020/08/30 v1.4c Standard LaTeX Graphics (DPC,SPQR)
+
+(c:/texlive/2021/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+(c:/texlive/2021/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: dvipdfmx.def on input line 105.
+
+(c:/texlive/2021/texmf-dist/tex/latex/graphics-def/dvipdfmx.def
+File: dvipdfmx.def 2021/03/18 v5.0j Graphics/color driver for dvipdfmx
+))
+\Gin@req@height=\dimen168
+\Gin@req@width=\dimen169
+)
+(c:/texlive/2021/texmf-dist/tex/latex/ascmac/ascmac.sty
+Package: ascmac 2020/01/15 v2.1 ascmac wrapper (community edition) 
+
+(c:/texlive/2021/texmf-dist/tex/latex/ascmac/tascmac.sty
+Package: tascmac 2020/01/15 v2.1 ascmac package (community edition) 
+\@savetbaselineshift=\dimen170
+\@saveybaselineshift=\dimen171
+\scb@x=\box66
+\scscb@x=\box67
+\@bw=\dimen172
+\@nbox=\box68
+\@nbody=\box69
+\@scw=\dimen173
+\ascmac@hoboxa=\box70
+\ascmac@hoboxb=\box71
+\@itemh=\dimen174
+\@iboxpos=\toks24
+\@iboxstr=\box72
+\@bwsp=\box73
+\@@bwsp=\box74
+\@bcal=\count276
+\shaderule=\dimen175
+))
+(c:/texlive/2021/texmf-dist/tex/latex/multirow/multirow.sty
+Package: multirow 2021/03/15 v2.8 Span multiple rows of a table
+\multirow@colwidth=\skip53
+\multirow@cntb=\count277
+\multirow@dima=\skip54
+\bigstrutjot=\dimen176
+)
+(c:/texlive/2021/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip17
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+(c:/texlive/2021/texmf-dist/tex/latex/listings/listings.sty
+\lst@mode=\count278
+\lst@gtempboxa=\box75
+\lst@token=\toks25
+\lst@length=\count279
+\lst@currlwidth=\dimen177
+\lst@column=\count280
+\lst@pos=\count281
+\lst@lostspace=\dimen178
+\lst@width=\dimen179
+\lst@newlines=\count282
+\lst@lineno=\count283
+\lst@maxwidth=\dimen180
+
+(c:/texlive/2021/texmf-dist/tex/latex/listings/lstmisc.sty
+File: lstmisc.sty 2020/03/24 1.8d (Carsten Heinz)
+\c@lstnumber=\count284
+\lst@skipnumbers=\count285
+\lst@framebox=\box76
+)
+(c:/texlive/2021/texmf-dist/tex/latex/listings/listings.cfg
+File: listings.cfg 2020/03/24 1.8d listings configuration
+))
+Package: listings 2020/03/24 1.8d (Carsten Heinz)
+
+(c:/texlive/2021/texmf-dist/tex/latex/jvlisting/jvlisting.sty
+Package: jvlisting 2011/11/17 v0.7 Formatted Program Listings
+\jvl@idt=\count286
+\jvl@tmphyphenchar=\count287
+\jvl@fileinput=\read2
+\listingskipamount=\skip55
+\listingindent=\dimen181
+\prelistingpenalty=\count288
+\listingpenalty=\count289
+\postlistingpenalty=\count290
+)
+(c:/texlive/2021/texmf-dist/tex/latex/listings/lstlang1.sty
+File: lstlang1.sty 2020/03/24 1.8d listings language file
+)
+(c:/texlive/2021/texmf-dist/tex/latex/listings/lstmisc.sty
+File: lstmisc.sty 2020/03/24 1.8d (Carsten Heinz)
+)
+(c:/texlive/2021/texmf-dist/tex/latex/l3backend/l3backend-dvips.def
+File: l3backend-dvips.def 2021-03-18 L3 backend support: dvips
+\l__pdf_internal_box=\box77
+\g__pdf_backend_object_int=\count291
+\l__pdf_backend_content_box=\box78
+\l__pdf_backend_model_box=\box79
+\g__pdf_backend_annotation_int=\count292
+\g__pdf_backend_link_int=\count293
+\g__pdf_backend_link_sf_int=\count294
+)
+(./卒業論文.aux)
+\openout1 = `卒業論文.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for JY1/mc/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+LaTeX Font Info:    Checking defaults for JT1/mc/m/n on input line 22.
+LaTeX Font Info:    ... okay on input line 22.
+\c@lstlisting=\count295
+LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
+(Font)              scaled to size 19.9311pt on input line 23.
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <20.74> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 23.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <20.74> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 23.
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 19.9311pt on input line 23.
+ (./卒業論文.toc
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <10.95> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 1.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <10.95> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 1.
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 10.52292pt on input line 1.
+LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
+(Font)              scaled to size 7.68799pt on input line 3.
+LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
+(Font)              scaled to size 5.76599pt on input line 3.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 3.
+
+(c:/texlive/2021/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 3.
+
+(c:/texlive/2021/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+) [1
+
+
+])
+\tf@toc=\write3
+\openout3 = `卒業論文.toc'.
+
+ [2]
+第 1 章
+[1
+
+]
+第 2 章
+File: ./hash1.png Graphic file (type bmp)
+<./hash1.png>
+File: ./hash2.png Graphic file (type bmp)
+<./hash2.png>
+[2
+
+]
+LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
+(Font)              scaled to size 13.83836pt on input line 60.
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <14.4> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 60.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <14.4> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 60.
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 13.83836pt on input line 60.
+File: ./md5.png Graphic file (type bmp)
+<./md5.png>
+File: ./sha-1.png Graphic file (type bmp)
+<./sha-1.png>
+ [3]
+File: ./sha-2.png Graphic file (type bmp)
+<./sha-2.png>
+LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
+(Font)              scaled to size 11.53198pt on input line 91.
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <12> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 91.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <12> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 91.
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 11.53198pt on input line 91.
+File: ./sha256.png Graphic file (type bmp)
+<./sha256.png>
+ [4] [5] [6] [7] [8] [9] [10]
+第 3 章
+[11
+
+]
+File: ./SAS-2first.png Graphic file (type bmp)
+<./SAS-2first.png>
+ [12]
+File: ./SAS-2.png Graphic file (type bmp)
+<./SAS-2.png>
+ [13] [14]
+File: ./SAS-L2first.png Graphic file (type bmp)
+<./SAS-L2first.png>
+ [15]
+File: ./SAS-L2.png Graphic file (type bmp)
+<./SAS-L2.png>
+ [16] [17] [18]
+第 4 章
+File: ./TWELITE.png Graphic file (type bmp)
+<./TWELITE.png>
+File: ./TWELITE-R.png Graphic file (type bmp)
+<./TWELITE-R.png>
+File: ./Current_BLUE.png Graphic file (type bmp)
+<./Current_BLUE.png>
+[19
+
+]
+File: ./TWE-CR2032.png Graphic file (type bmp)
+<./TWE-CR2032.png>
+ [20] [21]
+File: ./TWELITESTAGEBOARD.png Graphic file (type bmp)
+<./TWELITESTAGEBOARD.png>
+File: ./TWELITEDIPA.png Graphic file (type bmp)
+<./TWELITEDIPA.png>
+File: ./TWELITEDIPN.png Graphic file (type bmp)
+<./TWELITEDIPN.png>
+ [22]
+File: ./TWELITER2.png Graphic file (type bmp)
+<./TWELITER2.png>
+
+Overfull \hbox (22.94482pt too wide) in paragraph at lines 516--518
+[]\JY1/mc/m/n/10.95 工場出荷時に組み込まれているプログラムであり、 \OT1/cmr/m/n
+/10.95 TWELITE \JY1/mc/m/n/10.95 専用のライブラリ 「\OT1/cmr/m/n/10.95 MWSDK\JY
+1/mc/m/n/10.95 」
+ []
+
+[23]
+Overfull \hbox (16.70857pt too wide) in paragraph at lines 527--539
+ [][][][] 
+ []
+
+[24]
+第 5 章
+File: ./image5-1.png Graphic file (type bmp)
+<./image5-1.png>
+[25
+
+]
+File: ./image5-2.png Graphic file (type bmp)
+<./image5-2.png>
+ [26]
+Overfull \hbox (2.43333pt too wide) in paragraph at lines 600--616
+[][]$[]$[] []$[]$[] 
+ []
+
+File: ./graph2.png Graphic file (type bmp)
+<./graph2.png>
+[27]
+File: ./graph1.png Graphic file (type bmp)
+<./graph1.png>
+ [28] [29]
+第 6 章
+[30
+
+] [31
+
+] [32
+
+]
+付 録 A  
+File: ./another1.png Graphic file (type bmp)
+<./another1.png>
+File: ./another2.png Graphic file (type bmp)
+<./another2.png>
+File: ./another3.png Graphic file (type bmp)
+<./another3.png>
+[33
+
+]
+File: ./another4.png Graphic file (type bmp)
+<./another4.png>
+File: ./another5.png Graphic file (type bmp)
+<./another5.png>
+ [34]
+File: ./another6.png Graphic file (type bmp)
+<./another6.png>
+ [35]
+付 録 B  
+LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
+(Font)              scaled to size 8.64899pt on input line 742.
+LaTeX Font Info:    Font shape `JT1/mc/m/it' in size <9> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 743.
+LaTeX Font Info:    Font shape `JY1/mc/m/it' in size <9> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 743.
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 8.64899pt on input line 743.
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <9> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 744.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <9> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 744.
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 8.64899pt on input line 744.
+LaTeX Font Info:    Trying to load font information for OML+cmr on input line 7
+44.
+(c:/texlive/2021/texmf-dist/tex/latex/base/omlcmr.fd
+File: omlcmr.fd 2019/12/16 v2.5j Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OML/cmr/m/n' in size <9> not available
+(Font)              Font shape `OML/cmm/m/it' tried instead on input line 744.
+LaTeX Font Info:    Trying to load font information for OMS+cmr on input line 7
+60.
+
+(c:/texlive/2021/texmf-dist/tex/latex/base/omscmr.fd
+File: omscmr.fd 2019/12/16 v2.5j Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <9> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 760.
+ [36
+
+] [37] [38] [39]
+[40] [41] [42] [43] [44] [45] [46] [47] [48] [49] [50] [51] [52] [53] [54]
+(./卒業論文.aux) ) 
+Here is how much of TeX's memory you used:
+ 4837 strings out of 479466
+ 62813 string characters out of 5873880
+ 928087 words of memory out of 5000000
+ 22455 multiletter control sequences out of 15000+600000
+ 421190 words of font info for 105 fonts, out of 8000000 for 9000
+ 929 hyphenation exceptions out of 8191
+ 82i,14n,88p,649b,1752s stack positions out of 5000i,500n,10000p,200000b,80000s
+
+Output written on 卒業論文.dvi (56 pages, 228796 bytes).
