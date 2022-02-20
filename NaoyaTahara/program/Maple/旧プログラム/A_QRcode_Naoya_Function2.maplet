@@ -1,0 +1,19 @@
+
+isFinderPattern := proc(version, x, y) local size; size := QRcodeSize(version); return x <= 7 and y <= 7 or x <= 7 and size - 8 <= y or size - 8 <= x and y <= 7; end proc;
+isTimingPattern := proc(version, x, y) return not isFinderPattern(version, x, y) and (x = 6 or y = 6); end proc;
+isFunctionPattern := proc(version, x, y) return isFinderPattern(version, x, y) or isTimingPattern(version, x, y); end proc;
+dataWritable := proc(version, x, y) local size; size := QRcodeSize(version); if isFunctionPattern(version, x, y) then return false; end if; if x <= 8 and y <= 8 then return false; end if; if x = 8 and size - 8 <= y then return false; end if; if y = 8 and size - 8 <= x then return false; end if; if 7 <= version then if x < 6 and size - 11 <= y and y < size - 8 then return false; end if; if y < 6 and size - 11 <= x and x < size - 8 then return false; end if; end if; if x = 8 and y = 4*version + 9 then return false; end if; return true; end proc;
+PosProceed := proc(version, xref::uneval, yref::uneval) local size, x, y, relx, rely; x := eval(xref); y := eval(yref); size := QRcodeSize(version); ASSERT(x <> 6); relx := x; rely := y; if 6 < x then relx := relx - 1; end if; if relx mod 2 = 0 then if iquo(relx, 2) mod 2 = 0 then if rely = size - 1 then if relx = 0 then x := size - 1; else x := x - 1; end if; else x := x + 1; y := y + 1; end if; else if rely = 0 then if x = 7 then x := x - 2; else x := x - 1; end if; else x := x + 1; y := y - 1; end if; end if; else x := x - 1; end if; xref := x; yref := y; end proc;
+PosNext := proc(version, x_::uneval, y_::uneval) local size, x, y; x := eval(x_); y := eval(y_); size := QRcodeSize(version); do break; if x = 0 and y = size - 1; PosProceed(version, x, y); break; if dataWritable(version, x, y); end do; x_ := x; y_ := y; end proc;
+
+
+
+
+
+
+
+
+
+
+
+
