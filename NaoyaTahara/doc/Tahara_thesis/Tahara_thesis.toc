@@ -1,0 +1,18 @@
+\contentsline {chapter}{\numberline {第1章}序論}{1}
+\contentsline {chapter}{\numberline {第2章}QRコード}{2}
+\contentsline {section}{\numberline {2.1}QRコードの概要}{2}
+\contentsline {section}{\numberline {2.2}RS符号}{4}
+\contentsline {subsection}{\numberline {2.2.1}QRコード上のRS符号}{6}
+\contentsline {chapter}{\numberline {第3章}Aesthetic QRコード}{8}
+\contentsline {section}{\numberline {3.1}目的画像の二値化手法}{8}
+\contentsline {section}{\numberline {3.2}ランダム法}{10}
+\contentsline {section}{\numberline {3.3}色変換手法}{11}
+\contentsline {chapter}{\numberline {第4章}数式処理システムMapleを用いたAesthetic QRコードの実装}{13}
+\contentsline {section}{\numberline {4.1}数式処理システムMaple\cite {Maple}}{13}
+\contentsline {section}{\numberline {4.2}実験環境}{13}
+\contentsline {section}{\numberline {4.3}MapleによるQRコードの生成法の実装}{14}
+\contentsline {section}{\numberline {4.4}Aesthetic QRコードの生成に関する実験}{16}
+\contentsline {chapter}{\numberline {第5章}結論}{18}
+\contentsline {chapter}{謝辞}{19}
+\contentsline {chapter}{参考文献}{20}
+\contentsline {chapter}{\numberline {付 録A }プログラムリスト}{21}
