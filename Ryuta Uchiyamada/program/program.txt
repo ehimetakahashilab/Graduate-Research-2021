@@ -1,1 +1,11 @@
+control.py・・・制御プログラム
+connection.py・・・通信プログラム
+sasl2.c・・・SAS-L2認証プログラム
+sasl2_regi.c・・・SAS-L2初期登録プログラム
+crypto.c・・・通信データ暗号化プログラム
+db_resrt.py・・・データベースを初期化するプログラム
 
+
+・演算結果などを表示する箇所をコメントアウトしています。
+・sasl2とcryptoのsoファイルを以下のようにして作成してください。
+  $ gcc -shared -fPIC sasl2.c -o sasl2.so -Iinclude -Llib -lssl -lcrypto
